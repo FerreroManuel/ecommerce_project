@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-l*@5g11avb*zhlku=+_!gm-9xe=fdgw$9ke&u9-j-4cg($&5zb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['manuelferrero.com.ar', 'www.manuelferrero.com.ar' 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'manuelferrero.com.ar',
+    'www.manuelferrero.com.ar',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -40,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'store',
+    'basket',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.categories',
+                'basket.context_processors.basket',
             ],
         },
     },
