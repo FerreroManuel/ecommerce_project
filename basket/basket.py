@@ -53,7 +53,7 @@ class Basket():
         self.session.modified = True
 
 
-    def get_total_price(self):
+    def get_subtotal_price(self):
         """
         Obtiene los totales de todos los productos y devuelve el total
         """
