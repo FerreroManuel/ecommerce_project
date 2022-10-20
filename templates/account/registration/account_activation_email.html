@@ -1,0 +1,17 @@
+{% autoescape off %}
+
+Hola, {{ user.user_name }}, su cuenta ha sido creada con éxito. Por favor haga click en el link debajo para activar su cuenta.
+
+Link de activación:
+
+http://{{ domain }}{% url 'account:activate' uidb64=uid token=token %}
+
+
+Tiene 24 horas para realizar la activación.
+
+
+Muchas Gracias.
+
+BookStore.
+
+{% endautoescape %}
