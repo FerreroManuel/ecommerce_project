@@ -86,7 +86,7 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError('Las contraseñas no coinciden')
         return cd['password2']
 
-    
+
     def clean_email(self):
         email = self.cleaned_data['email']
         if UserBase.objects.filter(email=email).exists():
@@ -122,7 +122,7 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserEditForm(forms.ModelForm):
-    
+
     email = forms.EmailField(
         label='Email',
         max_length=200,
@@ -273,7 +273,7 @@ class UserEditForm(forms.ModelForm):
             'cell_phone',
             'home_phone',
         )
-    
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -293,7 +293,7 @@ class UserEditForm(forms.ModelForm):
 
 class PwdResetForm(PasswordResetForm):
     email = forms.EmailField(
-        max_length=150, 
+        max_length=150,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control mb-3',
@@ -303,7 +303,7 @@ class PwdResetForm(PasswordResetForm):
         )
     )
 
-    
+
     def clean_email(self):
         email = self.cleaned_data['email']
         u = UserBase.objects.filter(email=email)

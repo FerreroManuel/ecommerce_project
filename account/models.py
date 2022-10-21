@@ -8,7 +8,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CustomAccountManager(BaseUserManager):
-    
+
     def create_superuser(self, email, user_name, password, **other_fields):
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
@@ -26,12 +26,12 @@ class CustomAccountManager(BaseUserManager):
             )
 
         return self.create_user(email, user_name, password, **other_fields)
-    
+
 
     def create_user(self, email, user_name, password, **other_fields):
         if not email:
             raise ValueError(_('You must provide an email address'))
-        
+
         email = self.normalize_email(email)
         user = self.model(email=email, user_name=user_name, **other_fields)
         user.set_password(password)
@@ -83,7 +83,7 @@ class UserBase(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Accounts'
         verbose_name_plural = 'Accounts'
-    
+
 
     def email_user(self, subject, message):
         send_mail(

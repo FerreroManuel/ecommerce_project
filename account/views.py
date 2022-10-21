@@ -14,10 +14,10 @@ from .tokens import account_activation_token
 
 
 def account_register(request):
-    
+
     if request.user.is_authenticated:
         return redirect('/')
-    
+
     if request.method == 'POST':
         registerForm = RegistrationForm(request.POST)
         if registerForm.is_valid():
@@ -26,7 +26,7 @@ def account_register(request):
             user.set_password(registerForm.cleaned_data['password'])
             user.is_active = False
             user.save()
-            
+
             # Setup confirmation email
             current_site = get_current_site(request)
             subject = 'Activación de cuenta | BookStore'

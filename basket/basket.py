@@ -8,7 +8,7 @@ class Basket():
     """
 
     def __init__(self, request) -> None:
-        
+
         self.session = request.session
         basket = self.session.get('skey')
         if 'skey' not in request.session:
@@ -27,7 +27,7 @@ class Basket():
         else:
             self.basket[product_id]['qty'] += int(qty)
         self.save_session()
-    
+
 
     def delete(self, product_id):
         """
@@ -37,8 +37,8 @@ class Basket():
         if product_id in self.basket:
             del self.basket[product_id]
         self.save_session()
-    
-    
+
+
     def update(self, product_id, product_qty):
         """
         Actualiza la cantidad de un producto en de la sesión del carrito
@@ -58,7 +58,7 @@ class Basket():
         Obtiene los totales de todos los productos y devuelve el total
         """
         return float(sum(item['price'] * item['qty'] for item in self.basket.values()))
-    
+
 
     def __iter__(self):
         """
@@ -74,11 +74,11 @@ class Basket():
 
         for item in basket.values():
             item['total_price'] = float(item['price'] * item['qty'])
-            yield item  
+            yield item
 
 
     def __len__(self):
         """
         Obtiene la información del carrito y cuenta la cantidad de items
         """
-        return sum(item['qty'] for item in self.basket.values()) 
+        return sum(item['qty'] for item in self.basket.values())

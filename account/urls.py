@@ -43,7 +43,7 @@ urlpatterns = [
             success_url='password_reset_email_confirm',
             email_template_name='account/user/password_reset_email.html',
             form_class=PwdResetForm,
-        ), 
+        ),
         name='pwdreset',
     ),
     path(                       # password_reset_confirm
