@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-# from orders.views import user_orders
+from orders.views import user_orders
 from .forms import RegistrationForm, UserEditForm
 from .models import UserBase
 from .tokens import account_activation_token
@@ -69,7 +69,8 @@ def account_activate(request, uidb64, token):
 
 @login_required(login_url=reverse_lazy('account:login'))
 def dashboard(request):
-    return render(request, 'account/user/dashboard.html')
+    orders, orders_paid = user_orders(request)
+    return render(request, 'account/user/dashboard.html', {'orders': orders, 'orders_paid': orders_paid})
 
 
 @login_required(login_url=reverse_lazy('account:login'))

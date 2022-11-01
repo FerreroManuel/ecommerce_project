@@ -1,0 +1,31 @@
+.container-fluid {
+    max-width: 100%;
+}
+
+.orders-form input {
+    border: 2px solid #ccc;
+    height: calc(2em + .75rem + 2px);
+}
+
+.orders-form input:focus {
+    border-color: #1497ff;
+    box-shadow: none;
+}
+
+.orders-form input.form-check-input {
+    height: 1em;
+}
+
+.orders-form select {
+    border: 2px solid #ccc;
+    height: calc(2em + .75rem + 2px);
+}
+
+.orders-form select:focus {
+    border-color: #1497ff;
+    box-shadow: none;
+}
+
+.country-select-flag {
+    display: none;
+    }

@@ -1,0 +1,129 @@
+{% extends '../store/base.html' %}
+
+{% block title %}Confirmar pedido{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row no-gutter">
+        <div class="col-md-12">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-lg-7  mx-auto">
+
+                            <form class="orders-form px-4 pt-4" method="post" enctype="multipart/form-data">
+
+                                {% if order_form.is_valid %}
+                                <div class="alert alert-primary" role="alert">
+                                    Datos modificados correctamente!
+                                </div>
+                                <p class="small text-center pt-0">
+                                    <a href="{% url "account:dashboard" %}">Volver a Mi cuenta</a>
+                                </p>
+                                {%else%}
+                                
+                                <h3>Confirmar pedido</h3>
+                                
+                                {% endif %}
+
+                                {% if form.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    Hubo un error! Intente nuevamente...
+                                </div>
+                                {% endif %}
+
+
+                                {% csrf_token %}
+
+                                {% if  True%}                       {% comment %} Si envio == retiro local (y desp cambiar views){% endcomment %}
+
+                                    <br><h4>Datos para el retiro</h4>
+
+                                    {% comment %} full_name {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.full_name.label }}
+                                        (Sólo esta persona puede retirar el pedido)</label>
+                                    {{ order_form.full_name }}
+
+                                    {% comment %} phone {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.phone.label }}</label>
+                                    {{ order_form.phone }}
+                                    
+                                    {% comment %} total_paid {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.total_paid.label }}</label>
+                                    {{ order_form.total_paid }}
+                                                                    
+                                    {% if request.user.is_staff %}
+                                    
+                                        {% comment %} order_key {% endcomment %}
+                                        <label class="small font-weight-bold">{{ order_form.order_key.label }}</label>
+                                        {{ order_form.order_key }}
+                                        
+                                        {% comment %} billing_status {% endcomment %}
+                                        <br>
+                                        <label class="small font-weight-bold form-check-label">{{ order_form.billing_status.label }}</label>
+                                        {{ order_form.billing_status }}
+                                    
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <br><h4>Datos para el envío</h4>
+
+                                    {% comment %} full_name {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.full_name.label }}
+                                        (Sólo esta persona puede recibir el pedido)</label>
+                                    {{ order_form.full_name }}
+
+                                    {% comment %} address1 {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.address1.label }}</label>
+                                    {{ order_form.address1 }}
+
+                                    {% comment %} address2 {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.address2.label }}</label>
+                                    {{ order_form.address2 }}
+
+                                    {% comment %} city {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.city.label }}</label>
+                                    {{ order_form.city }}
+                                    
+                                    {% comment %} phone {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.phone.label }}</label>
+                                    {{ order_form.phone }}
+                                    
+                                    {% comment %} postcode {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.postcode.label }}</label>
+                                    {{ order_form.postcode }}
+                                    
+                                    {% comment %} total_paid {% endcomment %}
+                                    <label class="small font-weight-bold">{{ order_form.total_paid.label }}</label>
+                                    {{ order_form.total_paid }}
+
+                                    {% if request.user.is_staff %}
+                                    
+                                        {% comment %} order_key {% endcomment %}
+                                        <label class="small font-weight-bold">{{ order_form.order_key.label }}</label>
+                                        {{ order_form.order_key }}
+                                        
+                                        {% comment %} billing_status {% endcomment %}
+                                        <br>
+                                        <label class="small font-weight-bold form-check-label">{{ order_form.billing_status.label }}</label>
+                                        {{ order_form.billing_status }}
+
+                                    {% endif %}
+
+                                {% endif %}
+
+                                <button class="btn btn-primary btn-block py-2 mb-4 mt-5 fw-bold w-100" type="submit" id="confirm-button" >Confirmar pedido</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

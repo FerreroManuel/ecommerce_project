@@ -1,0 +1,35 @@
+{% extends '../store/base.html' %}
+
+{% block title %}Pedido confirmado{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row no-gutter">
+        <div class="col-md-12">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-lg-7  mx-auto">
+
+                            
+                            <h3> Pedido confirmado! </h3>
+                            <hr>
+                            <p>
+                                Recuerde que los productos y precios quedan reservados por 24 horas. Una vez transcurridas,
+                                si el pago no fue realizado, la orden será cancelada.
+                            </p>
+                            <div style="text-align: right;">
+                                <a href=" {% url 'account:dashboard' %} "> Volver a mi cuenta </a>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'store',
     'basket',
     'account',
-    'payment',
+    # 'payment',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,7 @@ PASSWORD_RESET_TIMEOUT_DAYS = 1
 
 # Country Flags
 COUNTRIES_FLAG_URL = 'img/country_flags/{code}_16.png'
+
+
+# Basket session ID
+BASKET_SESSION_ID = 'basket'

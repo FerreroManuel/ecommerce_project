@@ -1,18 +1,21 @@
+from decimal import Decimal
+from django.conf import settings
 from store.models import Product
 
 
 class Basket():
     """
     Clase base del carrito de compras que provee ciertos comportamientos por defecto
-    que se puede heredar o sobreescribir de ser necesario.
+    y se puede heredar o sobreescribir de ser necesario.
     """
 
     def __init__(self, request) -> None:
 
         self.session = request.session
-        basket = self.session.get('skey')
-        if 'skey' not in request.session:
-            basket = self.session['skey'] = {}
+        basket = self.session.get(settings.BASKET_SESSION_ID)
+        self.shipping = Decimal(0.00)
+        if settings.BASKET_SESSION_ID not in request.session:
+            basket = self.session[settings.BASKET_SESSION_ID] = {}
         self.basket = basket
 
 
@@ -49,15 +52,38 @@ class Basket():
         self.save_session()
 
 
-    def save_session(self):
-        self.session.modified = True
-
-
     def get_subtotal_price(self):
         """
         Obtiene los totales de todos los productos y devuelve el total
         """
-        return float(sum(item['price'] * item['qty'] for item in self.basket.values()))
+        return sum(Decimal(item['price']) * item['qty'] for item in self.basket.values())
+        
+
+    def get_total_price(self):
+        """
+        Obtiene el subtotal, le suma el envío y devuelve el total
+        """
+        subtotal = self.get_subtotal_price()
+        if subtotal == 0:
+            total = Decimal(0.00)
+        else:
+            total = subtotal + Decimal(self.shipping)
+        return total
+
+
+    def save_session(self):
+        """
+        Guarda la sesión
+        """
+        self.session.modified = True
+
+
+    def clear(self):
+        """
+        Elimina el carrito de la sesión
+        """
+        del self.session[settings.BASKET_SESSION_ID]
+        self.save_session()
 
 
     def __iter__(self):

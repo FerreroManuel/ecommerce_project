@@ -1,0 +1,52 @@
+{% autoescape off %}
+
+<h2>Pedido confirmado:</h2>
+
+<strong>Usuario:</strong> {{ user.user_name }}
+<br>
+{% comment %} {% if  %} {% endcomment %}
+    <strong>Nombre completo de quien retira:</strong> {{ order.full_name }}
+    <br>
+    <strong>Teléfono:</strong> {{ order.phone }}
+    <br>
+{% comment %} {% else %}
+    <strong>Nombre completo de quien recibe:</strong> {{ order.full_name }}
+    <br>
+    <strong>Teléfono:</strong> {{ order.phone }}
+    <br>
+    <strong>Domicilio (línea 1):</strong> {{ order.address1 }}
+    <br>
+    <strong>Domicilio (línea 2):</strong> {{ order.address2 }}
+    <br>
+    <strong>Ciudad:</strong> {{ order.city }}
+    <br>
+    <strong>Código Postal:</strong> {{ order.postcode }}
+    <br>
+{% endif %} {% endcomment %}
+<hr>
+<strong>Productos:</strong>
+<ul>
+    {% for item in order.items.all %}
+        <li> {{ item.quantity }}x {{ item.product|title }} ({{ item.product.author }}) - $ {{ item.product.price }} (c/u)</li>
+    {% endfor %}
+</ul>
+<br>
+{% comment %}
+{% if  %}
+Envío: $ {{  }}
+<br>
+{% endif %}
+{% endcomment %}
+Costo total: $ {{ order.total_paid }}
+<br>
+<hr>
+<br>
+<u>Recuerde que tiene 24 horas para realizar el pago</u>
+    (<a href="http://{{ domain }}{% url 'store:payment_methods' %}" target="_blank">Ver medios de pago</a>).
+<br>
+<br>
+Muchas Gracias.
+<br>
+<strong><a href="http://{{ domain }}/" target="_blank">BookStore.</a></strong>
+
+{% endautoescape %}

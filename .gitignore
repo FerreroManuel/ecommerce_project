@@ -1,3 +1,7 @@
+# Payment app
+**/payments/
+**/payment/
+
 # Database connection data file
 database.json
 

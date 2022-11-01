@@ -52,7 +52,7 @@ class UserBase(AbstractBaseUser, PermissionsMixin):
     city = models.CharField(max_length=150, blank=True)
     postcode = models.CharField(max_length=12, blank=True)
     address_line_1 = models.CharField(max_length=150, blank=True)
-    address_line_2 = models.CharField(max_length=150, blank=True)
+    address_line_2 = models.CharField(max_length=150, blank=True, null=True)
     cell_phone = PhoneNumberField(blank=True)
     home_phone = PhoneNumberField(blank=True)
 
@@ -66,18 +66,7 @@ class UserBase(AbstractBaseUser, PermissionsMixin):
     objects = CustomAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
-        'user_name',
-        # 'first_name',
-        # 'last_name',
-        # 'country',
-        # 'state',
-        # 'city',
-        # 'postcode',
-        # 'address_line_1',
-        # 'address_line_2',
-        # 'cell_phone',
-    ]
+    REQUIRED_FIELDS = ['user_name']
 
 
     class Meta:
