@@ -1,14 +1,14 @@
-{% extends 'base.html' %}
+{% extends './index.html' %}
 {% load static %}
 
 {% block title %}
-    Medios de pago
+  {{ category.name|title }}
 {% endblock title %}
 
 {% block stylesheet %}
     {% static 'store/css/store.css' %}
 {% endblock stylesheet %}
 
-{% block content %}
-<h1>ACA PONER CBU Y DEMÁS MÉTODOS DE PAGO</h1>
-{% endblock content %}
+{% block h1 %}
+  {{ category.name|title }}
+{% endblock h1 %}

@@ -47,6 +47,36 @@ html, body, p, div{
 
 /* Navigation-Main*/
 
+/* Basket */
+.basket-qty{
+    color: #fff;
+    background: #6114d4;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 11px;
+    height: 15px;
+    width: 14px;
+    position: absolute;
+    box-sizing: content-box;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 1px;
+    right: 10px;
+}
+
+.basket-btn{
+    position: relative;
+}
+
+.basket-btn:hover, .basket-btn:focus, .basket-btn:active, .basket-btn.active{
+    color:#6114d4;
+    transition-duration: 0.4s;
+    background-color: #fff;
+}
+
 /* xs */
 .logo {
     width: 49px;

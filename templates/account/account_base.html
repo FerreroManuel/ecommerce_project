@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+    {% static 'account/css/account.css' %}
+{% endblock stylesheet %}
+
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-md-12">
+                <div class="login d-flex align-items-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12 col-lg-8 mx-auto">
+                                {% block account_content %}
+                                    
+                                {% endblock account_content %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

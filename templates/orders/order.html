@@ -1,6 +1,13 @@
-{% extends '../store/base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Confirmar pedido{% endblock title %}
+{% block title %}
+    Confirmar pedido
+{% endblock title %}
+
+{% block stylesheet %}
+    {% static 'orders/css/orders.css' %}
+{% endblock stylesheet %}
 
 {% block content %}
 

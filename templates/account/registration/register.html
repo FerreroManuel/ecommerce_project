@@ -1,60 +1,71 @@
-{% extends '../../store/base.html' %}
+{% extends 'account/account_base.html' %}
+{% load static %}
+
 {% block title %}
     Registrar nueva cuenta de usuario
 {% endblock title %}
 
-{% block content %}
+{% block account_content %}
 
-<div class="container-fluid">
-    <div class="row no-gutter">
-        <div class="col-md-12">
-            <div class="login d-flex align-items-center py-5">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 col-lg-7  mx-auto">
-                             <form class="account-form p-4 rounded col-lg-10 mx-auto" action="." method="post">
-                                {% csrf_token %}
-                                <h3 class="mb-2">Crear nueva cuenta de usuario</h3>
-                                <p class="mb-4 text-muted small fst-italic">Los campos marcados con * son obligatorios</p>
+    {% if request.method == 'POST' %}
 
-                                {% if form.errors %}
-                                <p>Por favor corrija los siguientes errores:</p>
-                                {% for field in form %}
-                                {% if field.errors %}
-                                <div class="alert alert-primary" role="alert">
-                                    {{ field.label }}: {{ field.errors|striptags }}
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                                {% endif %}
-
-                                <label>{{ form.user_name.label }}<span class="text-muted small">
-                                        *</span></label>
-                                {{ form.user_name }}
-                                <label>{{ form.email.label}}<span class="text-muted small">
-                                        *</span></label>
-                                {{ form.email }}
-                                <label>{{ form.password.label}}<span class="text-muted mb-4">
-                                        </span></label>
-                                 <small class="form-text text-muted mb-4 small">
-                                    *
-                                </small>
-                                <span class="text-muted small fst-italic">(Mínimo 8 caracteres incluyendo 1 número)</span>
-                                {{ form.password }}
-                                <label>{{ form.password2.label}}<span class="text-muted small">
-                                        *</span></label>
-                                {{ form.password2 }}
-                                <button class="btn btn-primary btn-block py-2 mb-4 mt-5 fw500 w-100" type="submit">Registrar</button>
-                                <p class="text-center">
-                                    <a href="{% url "account:login" %}">Ya tengo una cuenta de usuario</a>
-                                </p>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="alert alert-primary fw600 rounded-0 border-0 py-3" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+            class="bi bi-info-circle me-2" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <path
+                d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+            </svg>
+            <b>
+                Su cuenta ha sido creada con éxito.<br><br>
+            </b>
+                Por favor verifique su casilla de correo, tiene 24 horas para confirmar su email.<br>
+                Si no encuentra el correo dentro de la bandeja de entrada, por favor verifique la carpeta de spam.<br>
+                Gracias.
         </div>
-    </div>
-</div>
+        <div>
+            <a href="/">Volver al inicio</a>
+        </div>
 
-{% endblock content %}
+    {% else %}
+
+        <form class="account-form p-4 rounded" action="." method="post">
+            {% csrf_token %}
+            <h3 class="mb-2">Crear nueva cuenta de usuario</h3>
+            <p class="mb-4 text-muted small fst-italic">Los campos marcados con * son obligatorios</p>
+
+            {% if form.errors %}
+            <p>Por favor corrija los siguientes errores:</p>
+            {% for field in form %}
+            {% if field.errors %}
+            <div class="alert alert-danger small" role="alert">
+                {{ field.errors|striptags }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            <label>{{ form.user_name.label }}<span class="text-muted small">
+                    *</span></label>
+            {{ form.user_name }}
+            <label>{{ form.email.label}}<span class="text-muted small">
+                    *</span></label>
+            {{ form.email }}
+            <label>{{ form.password.label}}<span class="text-muted mb-4">
+                    </span></label>
+                <small class="form-text text-muted mb-4 small">
+                *
+            </small>
+            <span class="text-muted small fst-italic">(Mínimo 8 caracteres incluyendo 1 número)</span>
+            {{ form.password }}
+            <label>{{ form.password2.label}}<span class="text-muted small">
+                    *</span></label>
+            {{ form.password2 }}
+            <button class="btn btn-primary btn-block py-2 mb-4 mt-5 fw500 w-100" type="submit">Registrar</button>
+            <p class="text-center">
+                <a href="{% url "account:login" %}">Ya tengo una cuenta de usuario</a>
+            </p>
+        </form>
+    {% endif %}
+
+{% endblock account_content %}

@@ -72,11 +72,11 @@ class RegistrationForm(forms.ModelForm):
         )
 
 
-    def clean_username(self):
+    def clean_user_name(self):
         user_name = self.cleaned_data['user_name'].lower()
         r = UserBase.objects.filter(user_name=user_name)
         if r.count():
-            raise forms.ValidationError("El nombre de usuario ya existe")
+            raise forms.ValidationError('El nombre de usuario ingresado ya se encuentra registrado')
         return user_name
 
 

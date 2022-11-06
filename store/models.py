@@ -5,6 +5,10 @@ from django.conf import settings
 
 class ProductManager(models.Manager):
     def get_queryset(self):
+        """
+        Sobreescritura de get_queryset del ProductManager para que sólo retorne los productos
+        donde is_active es verdadero
+        """
         return super(ProductManager, self).get_queryset().filter(is_active=True)
 
 
@@ -35,7 +39,10 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    # Al llamar a .objects utiliza el query_set de models.Manager
     objects = models.Manager()
+    # Al llamar a .products utiliza el query_set de ProductManager (filtrado por is_active)
     products = ProductManager()
 
     class Meta:

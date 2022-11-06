@@ -40,11 +40,7 @@ def account_register(request):
                 },
             )
             user.email_user(subject=subject, message=message)
-            response = """
-            Su cuenta ha sido creada con éxito. Por favor verifique su casilla de correo, tiene 24 horas para confirmar su email.
-            no encuentra el correo dentro de la bandeja de entrada, por favor verifique la carpeta de spam. Gracias.
-            """
-            return HttpResponse(response)
+            return render(request, 'account/registration/register.html')
     else:
         registerForm = RegistrationForm()
 
@@ -70,7 +66,7 @@ def account_activate(request, uidb64, token):
 @login_required(login_url=reverse_lazy('account:login'))
 def dashboard(request):
     orders, orders_paid = user_orders(request)
-    return render(request, 'account/user/dashboard.html', {'orders': orders, 'orders_paid': orders_paid})
+    return render(request, 'account/dashboard/dashboard.html', {'orders': orders, 'orders_paid': orders_paid})
 
 
 @login_required(login_url=reverse_lazy('account:login'))
@@ -81,7 +77,7 @@ def edit_details(request):
             user_form.save()
     else:
         user_form = UserEditForm(instance=request.user)
-    return render(request, 'account/user/edit_details.html', {'user_form': user_form})
+    return render(request, 'account/dashboard/edit_details.html', {'user_form': user_form})
 
 
 @login_required

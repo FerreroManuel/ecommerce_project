@@ -81,15 +81,6 @@ def add(request):
             },
         )
         user.email_user(subject=subject, message=message)
-        # response = """
-        # Su cuenta ha sido creada con éxito. Por favor verifique su casilla de correo, tiene 24 horas para confirmar su email.
-        # no encuentra el correo dentro de la bandeja de entrada, por favor verifique la carpeta de spam. Gracias.
-        # """
-        # return HttpResponse(response)
-
-
-
-
     return render(request, 'orders/order_confirm.html')
 
 
