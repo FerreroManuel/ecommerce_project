@@ -2,12 +2,14 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
-from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
 from orders.views import user_orders
+
 from .forms import RegistrationForm, UserEditForm
 from .models import UserBase
 from .tokens import account_activation_token
@@ -16,35 +18,35 @@ from .tokens import account_activation_token
 def account_register(request):
 
     if request.user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         registerForm = RegistrationForm(request.POST)
         if registerForm.is_valid():
             user = registerForm.save(commit=False)
-            user.email = registerForm.cleaned_data['email']
-            user.set_password(registerForm.cleaned_data['password'])
+            user.email = registerForm.cleaned_data["email"]
+            user.set_password(registerForm.cleaned_data["password"])
             user.is_active = False
             user.save()
 
             # Setup confirmation email
             current_site = get_current_site(request)
-            subject = 'Activación de cuenta | BookStore'
+            subject = "Activación de cuenta | BookStore"
             message = render_to_string(
-                'account/registration/account_activation_email.html',
+                "account/registration/account_activation_email.html",
                 {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                    'token': account_activation_token.make_token(user),
+                    "user": user,
+                    "domain": current_site.domain,
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "token": account_activation_token.make_token(user),
                 },
             )
             user.email_user(subject=subject, message=message)
-            return render(request, 'account/registration/register.html')
+            return render(request, "account/registration/register.html")
     else:
         registerForm = RegistrationForm()
 
-    return render(request, 'account/registration/register.html', {'form': registerForm})
+    return render(request, "account/registration/register.html", {"form": registerForm})
 
 
 def account_activate(request, uidb64, token):
@@ -58,26 +60,26 @@ def account_activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return redirect('account:dashboard')
+        return redirect("account:dashboard")
     else:
-        return render(request, 'account/registration/activation_invalid.html')
+        return render(request, "account/registration/activation_invalid.html")
 
 
-@login_required(login_url=reverse_lazy('account:login'))
+@login_required(login_url=reverse_lazy("account:login"))
 def dashboard(request):
     orders, orders_paid = user_orders(request)
-    return render(request, 'account/dashboard/dashboard.html', {'orders': orders, 'orders_paid': orders_paid})
+    return render(request, "account/dashboard/dashboard.html", {"orders": orders, "orders_paid": orders_paid})
 
 
-@login_required(login_url=reverse_lazy('account:login'))
+@login_required(login_url=reverse_lazy("account:login"))
 def edit_details(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = UserEditForm(instance=request.user, data=request.POST)
         if user_form.is_valid():
             user_form.save()
     else:
         user_form = UserEditForm(instance=request.user)
-    return render(request, 'account/dashboard/edit_details.html', {'user_form': user_form})
+    return render(request, "account/dashboard/edit_details.html", {"user_form": user_form})
 
 
 @login_required
@@ -86,4 +88,4 @@ def delete_user(request):
     user.is_active = False
     user.save()
     logout(request)
-    return redirect('account:delete_confirm')
+    return redirect("account:delete_confirm")
