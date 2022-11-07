@@ -1,5 +1,7 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import (
+    LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+    )
 from django.views.generic import TemplateView
 from . import views
 from .forms import UserLoginForm, PwdResetForm, PwdResetConfirmForm

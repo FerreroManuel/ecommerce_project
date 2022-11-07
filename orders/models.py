@@ -4,7 +4,6 @@ from django.db import models
 from store.models import Product
 
 
-
 class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

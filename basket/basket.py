@@ -57,7 +57,7 @@ class Basket():
         Obtiene los totales de todos los productos y devuelve el total
         """
         return sum(Decimal(item['price']) * item['qty'] for item in self.basket.values())
-        
+
 
     def get_total_price(self):
         """

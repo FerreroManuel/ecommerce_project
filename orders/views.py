@@ -68,7 +68,7 @@ def add(request):
                 price=item['price'],
                 quantity=item['qty'],
             )
-        
+
         # Setup confirmation email
         current_site = get_current_site(request)
         subject = 'Pedido confirmado | BookStore'

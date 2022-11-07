@@ -87,7 +87,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# Por motivos de seguridad los datos de acceso a la base de datos se encuentran en un archivo json incluido en .gitignore
+# Por motivos de seguridad los datos de acceso a la base de datos se encuentran
+# en un archivo json incluido en .gitignore
 with open('database.json', 'r') as arch:
     db_connect_data = loads(arch.read())
 

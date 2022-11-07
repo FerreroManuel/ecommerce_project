@@ -3,8 +3,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 from .models import Order
 
 
-
-
 class OrderForm(forms.ModelForm):
     full_name = forms.CharField(
         label='Nombre completo',
@@ -119,17 +117,17 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = (
-        'full_name',
-        'address1',
-        'address2',
-        'city',
-        'phone',
-        'postcode',
-        'total_paid',
-        'order_key',
-        'billing_status',
+            'full_name',
+            'address1',
+            'address2',
+            'city',
+            'phone',
+            'postcode',
+            'total_paid',
+            'order_key',
+            'billing_status',
         )
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['full_name'].required = True
