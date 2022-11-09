@@ -33,9 +33,13 @@
           {% for product in products %}
           <div class="col">
             <div class="card border-0">
-              <a  href="{{ product.get_absolute_url }}">
-                <img class="img-fluid" alt="{{product.name}}" src="{{ product.image.url }}">
-              </a>
+              {% for image in product.product_image.all  %}
+                {% if image.is_feature %}
+                  <a  href="{{ product.get_absolute_url }}">
+                    <img class="img-fluid" alt="{{ image.alt_text }}" src="{{ image.image.url }}">
+                  </a>
+                {% endif %}
+              {% endfor %}
               <div class="card-body px-0">
                 <p class="card-text">
                   <a class="text-dark text-decoration-none"
@@ -44,11 +48,11 @@
                 <p class="card-text">
                   <small class="text-muted">{{ product.author|title }}</small>
                 </p>
-                {% if product.in_stock %}
-                  <div class="fw-bold">$ {{product.price}}</div>
-                {% else %}
-                  <div class="fw-bold" style="color: red"> SIN STOCK </div>
-                {% endif %}
+                {% comment %} {% if product.in_stock %} {% endcomment %}
+                  <div class="fw-bold">$ {{ product.regular_price }}</div>
+                {% comment %} {% else %} {% endcomment %}
+                  {% comment %} <div class="fw-bold" style="color: red"> SIN STOCK </div> {% endcomment %}
+                {% comment %} {% endif %} {% endcomment %}
               </div>
             </div>
           </div>
