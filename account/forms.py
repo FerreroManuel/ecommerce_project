@@ -4,125 +4,132 @@ from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
 )
+from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from django_countries.widgets import CountrySelectWidget
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .models import UserBase
+from .models import Address, Customer
 
 
 class RegistrationForm(forms.ModelForm):
 
-    user_name = forms.CharField(
-        label="Nombre de usuario",
-        min_length=4,
-        max_length=50,
-        help_text="*",
-        error_messages={
-            "required": "El campo Nombre de usuario es obligatorio",
-        },
-    )
     email = forms.EmailField(
         max_length=100,
         help_text="*",
         error_messages={
-            "required": "El campo Email es obligatorio",
+            "required": _("Email field is required"),
+        },
+    )
+    name = forms.CharField(
+        label=_("Name"),
+        min_length=4,
+        max_length=50,
+        help_text="*",
+        error_messages={
+            "required": _("Name field is required"),
+        },
+    )
+    phone_number = PhoneNumberField().formfield(
+        label=_("Phone number"),
+        help_text="*",
+        error_messages={
+            "required": _("Phone number field is required"),
         },
     )
     password = forms.CharField(
-        label="Contraseña",
-        widget=forms.PasswordInput,
+        label=_("Password"),
         error_messages={
-            "required": "El campo Contraseña es obligatorio",
+            "required": _("Password field is required"),
         },
     )
     password2 = forms.CharField(
-        label="Repita la contraseña",
-        widget=forms.PasswordInput,
+        label=_("Repeat password"),
         error_messages={
-            "required": "El campo Contraseña es obligatorio",
+            "required": _("Repeat password field is required"),
         },
     )
 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["user_name"].widget.attrs.update(
-            {
-                "class": "form-control mb3",
-                "placeholder": "Nombre de usuario",
-                "name": "user_name",
-            }
-        )
         self.fields["email"].widget.attrs.update(
             {
                 "class": "form-control mb3",
                 "placeholder": "Email",
-                "name": "email",
+                "id": "email",
+            }
+        )
+        self.fields["name"].widget.attrs.update(
+            {
+                "class": "form-control mb3",
+                "placeholder": _("Name"),
+                "id": "name",
+            }
+        )
+        self.fields["phone_number"].widget.attrs.update(
+            {
+                "class": "form-control mb3",
+                "placeholder": _("Phone number"),
+                "id": "phone_number",
             }
         )
         self.fields["password"].widget.attrs.update(
             {
                 "class": "form-control mb3",
-                "placeholder": "Contraseña",
-                "name": "password",
+                "placeholder": _("Password"),
+                "id": "password",
             }
         )
         self.fields["password2"].widget.attrs.update(
             {
-                "class": "form-control",
-                "placeholder": "Repita contraseña",
-                "name": "password2",
+                "class": "form-control mb3",
+                "placeholder": _("Repeat password"),
+                "id": "password2",
             }
         )
-
-
-    def clean_user_name(self):
-        user_name = self.cleaned_data["user_name"].lower()
-        r = UserBase.objects.filter(user_name=user_name)
-        if r.count():
-            raise forms.ValidationError("El nombre de usuario ingresado ya se encuentra registrado")
-        return user_name
 
 
     def clean_password2(self):
         cd = self.cleaned_data
         if cd["password"] != cd["password2"]:
-            raise forms.ValidationError("Las contraseñas no coinciden")
+            raise forms.ValidationError(_("Passwords don't match"))
         return cd["password2"]
 
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if UserBase.objects.filter(email=email).exists():
-            raise forms.ValidationError("El email ingresado ya se encuentra registrado")
+        if Customer.objects.filter(email=email).exists():
+            raise forms.ValidationError(_("The email is already registered in our database"))
         return email
 
 
     class Meta:
-        model = UserBase
-        fields = ("user_name", "email")
+        model = Customer
+        fields = ("name", "email", "phone_number")
 
 
 class UserLoginForm(AuthenticationForm):
 
     username = forms.CharField(
-        widget=forms.TextInput(
+        label="Email",
+        widget=forms.EmailInput(
             attrs={
                 "class": "form-control mb-3",
-                "placeholder": "Nombre de usuario",
-                "id": "login-username",
+                "placeholder": "Email",
+                "id": "email",
             }
-        )
+        ),
     )
     password = forms.CharField(
+        label=_("Password"),
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control mb-3",
-                "placeholder": "Contraseña",
+                "placeholder": _("Password"),
                 "id": "login-pwd",
             }
-        )
+        ),
     )
 
 
@@ -140,156 +147,44 @@ class UserEditForm(forms.ModelForm):
             },
         ),
     )
-    user_name = forms.CharField(
-        label="Nombre de usuario",
+    name = forms.CharField(
+        label=_("Name"),
         max_length=150,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control mb3",
-                "placeholder": "Nombre de usuario",
-                "id": "form-username",
+                "placeholder": _("Name"),
+                "id": "form-name",
                 "readonly": "readonly",
             },
         ),
     )
-    first_name = forms.CharField(
-        label="Nombre",
-        min_length=4,
-        max_length=150,
+    phone_number = PhoneNumberField().formfield(
+        label=_("Phone number"),
         widget=forms.TextInput(
             attrs={
                 "class": "form-control mb3",
-                "placeholder": "Nombre",
-                "id": "form-firstname",
-            },
-        ),
-    )
-    last_name = forms.CharField(
-        label="Apellido",
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Apellido",
-                "id": "form-lastname",
-            },
-        ),
-    )
-    country = CountryField(blank_label="Seleccione un país",).formfield(
-        label="País",
-        widget=CountrySelectWidget(
-            attrs={"class": "form-select form-control mb3", "id": "form-country", "src": ""},
-        ),
-    )
-    state = forms.CharField(
-        label="Provincia / Estado",
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Provincia / Estado",
-                "id": "form-state",
-            },
-        ),
-    )
-    city = forms.CharField(
-        label="Ciudad",
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Ciudad",
-                "id": "form-city",
-            },
-        ),
-    )
-    postcode = forms.CharField(
-        label="Código postal",
-        max_length=12,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Código postal",
-                "id": "form-postcode",
-            },
-        ),
-    )
-    address_line_1 = forms.CharField(
-        label="Domicilio (línea 1)",
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Domicilio (línea 1)",
-                "id": "form-address1",
-            },
-        ),
-    )
-    address_line_2 = forms.CharField(
-        label="Domicilio (línea 2)",
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Domicilio (línea 2)",
-                "id": "form-address2",
-            },
-        ),
-    )
-    cell_phone = PhoneNumberField().formfield(
-        label="Teléfono celular",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Teléfono celular",
-                "id": "form-cellphone",
-            },
-        ),
-    )
-    home_phone = PhoneNumberField().formfield(
-        label="Teléfono fijo",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control mb3",
-                "placeholder": "Teléfono fijo",
-                "id": "form-homephone",
+                "placeholder": _("Phone number"),
+                "id": "form-phone_number",
             },
         ),
     )
 
 
     class Meta:
-        model = UserBase
+        model = Customer
         fields = (
             "email",
-            "user_name",
-            "first_name",
-            "last_name",
-            "country",
-            "state",
-            "city",
-            "postcode",
-            "address_line_1",
-            "address_line_2",
-            "cell_phone",
-            "home_phone",
+            "name",
+            "phone_number",
         )
 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["user_name"].required = True
         self.fields["email"].required = True
-        self.fields["first_name"].required = False
-        self.fields["last_name"].required = False
-        self.fields["country"].required = False
-        self.fields["state"].required = False
-        self.fields["city"].required = False
-        self.fields["postcode"].required = False
-        self.fields["address_line_1"].required = False
-        self.fields["address_line_2"].required = False
-        self.fields["cell_phone"].required = False
-        self.fields["home_phone"].required = False
+        self.fields["name"].required = True
+        self.fields["phone_number"].required = True
 
 
 class PwdResetForm(PasswordResetForm):
@@ -301,22 +196,147 @@ class PwdResetForm(PasswordResetForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        u = UserBase.objects.filter(email=email)
+        u = Customer.objects.filter(email=email)
         if not u:
-            raise forms.ValidationError("La dirección de correo electrónico idicada no se encuentra registrada")
+            raise forms.ValidationError(_("The email is not registered in our database"))
         return email
 
 
 class PwdResetConfirmForm(SetPasswordForm):
     new_password1 = forms.CharField(
-        label="Nueva contraseña",
+        label=_("New password"),
         widget=forms.PasswordInput(
-            attrs={"class": "form-control mb-3", "placeholder": "Nueva contraseña", "id": "form-newpass1"}
+            attrs={"class": "form-control mb-3", "placeholder": _("New password"), "id": "form-newpass1"}
         ),
     )
     new_password2 = forms.CharField(
-        label="Repita contraseña",
+        label=_("Repeat password"),
         widget=forms.PasswordInput(
-            attrs={"class": "form-control mb-3", "placeholder": "Repita contraseña", "id": "form-newpass2"}
+            attrs={"class": "form-control mb-3", "placeholder": _("Repeat password"), "id": "form-newpass2"}
         ),
     )
+
+
+class UserAddressForm(forms.ModelForm):
+    full_name = forms.CharField(
+        label=_("Full name"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Full name"),
+                "id": "form-full-name",
+            },
+        ),
+    )
+    phone_number = PhoneNumberField().formfield(
+        label=_("Phone number"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Phone number"),
+                "id": "form-phone_number",
+            },
+        ),
+    )
+    country = CountryField(blank_label=_("Select country"),).formfield(
+        label=_("Country"),
+        widget=CountrySelectWidget(
+            attrs={"class": "form-select form-control mb3", "id": "form-country", "src": ""},
+        ),
+    )
+    state = forms.CharField(
+        label=_("Province / State"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Province / State"),
+                "id": "form-state",
+            },
+        ),
+    )
+    city = forms.CharField(
+        label=_("City"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("City"),
+                "id": "form-city",
+            },
+        ),
+    )
+    postcode = forms.CharField(
+        label=_("Postal code"),
+        max_length=12,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Postal code"),
+                "id": "form-postcode",
+            },
+        ),
+    )
+    address_line_1 = forms.CharField(
+        label=_("Address (line 1)"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Address (line 1)"),
+                "id": "form-address1",
+            },
+        ),
+    )
+    address_line_2 = forms.CharField(
+        label=_("Address (line 2)"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Address (line 2)"),
+                "id": "form-address2",
+            },
+        ),
+    )
+    delivery_instructions = forms.CharField(
+        label=_("Delivery instructions"),
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Delivery instructions"),
+                "id": "form-delivery_instructions",
+            },
+        ),
+    )
+    
+    class Meta:
+        model = Address
+        fields = (
+            "full_name",
+            "phone_number",
+            "country",
+            "state",
+            "city",
+            "postcode",
+            "address_line_1",
+            "address_line_2",
+            "delivery_instructions",
+        )
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["full_name"].required = True
+        self.fields["phone_number"].required = True
+        self.fields["country"].required = True
+        self.fields["state"].required = True
+        self.fields["city"].required = True
+        self.fields["postcode"].required = True
+        self.fields["address_line_1"].required = True
+        self.fields["address_line_2"].required = False
+        self.fields["delivery_instructions"].required = False
+
+

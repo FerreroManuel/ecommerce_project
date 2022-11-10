@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Mis direcciones
+{% endblock title %}
+
+{% block stylesheet %}
+{% static 'account/css/account.css' %}
+{% endblock stylesheet %}
+
+
+{% block content %}
+
+
+<div class="container">
+  <div class="col-6 mx-auto">
+    <h1 class="h3">Crear/editar dirección</h1>
+    <div>Crear o editar una dirección de envío.</div>
+    <hr />
+    <form name="address_form" class="account-form" method="post" enctype="multipart/form-data">
+      {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        Error: Intente nuevamente! {{ form.errors }}
+      </div>
+      {% endif %}
+      {% csrf_token %}
+      <label class="small fw-bold">{{ form.full_name.label}}</label>
+      {{ form.full_name }}
+      <label class="small fw-bold">{{ form.phone_number.label}}</label>
+      {{ form.phone_number }}
+      <label class="small fw-bold">{{ form.country.label}}</label>
+      {{ form.country }}
+      <label class="small fw-bold">{{ form.state.label}}</label>
+      {{ form.state }}
+      <label class="small fw-bold">{{ form.city.label}}</label>
+      {{ form.city }}
+      <label class="small fw-bold">{{ form.postcode.label}}</label>
+      {{ form.postcode }}
+      <label class="small fw-bold">{{ form.address_line_1.label}}</label>
+      {{ form.address_line_1 }}
+      <label class="small fw-bold">{{ form.address_line_2.label}}</label>
+      {{ form.address_line_2 }}
+      <label class="small fw-bold">{{ form.delivery_instructions.label}}</label>
+      {{ form.delivery_instructions }}
+      <button class="btn btn-primary btn-block py-2 mb-4 mt-4 fw-bold w-100" type="button" value="Submit"
+        onclick="submitForm()">
+        Agregar dirección
+      </button>
+    </form>
+
+  </div>
+</div>
+
+
+<script>
+  function submitForm() {
+    var form = document.getElementsByName('address_form')[0];
+    form.submit(); // Submit the form
+    form.reset(); // Reset all form data
+    return false; // Prevent page refresh
+  }
+</script>
+
+{% endblock content %}

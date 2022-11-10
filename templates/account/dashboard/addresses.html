@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Mis direcciones
+{% endblock title %}
+
+{% block stylesheet %}
+{% static 'account/css/account.css' %}
+{% endblock stylesheet %}
+
+
+{% block content %}
+
+
+<div class="container">
+  <h1 class="h2">Mis direcciones de envío</h1>
+  <div>Administrar mis direcciones y opciones de envío</div>
+  <hr />
+  <div class="container px-0">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      <div class="col">
+        <a href="{% url "account:add_address" %}" class="text-reset text-decoration-none" role="button"
+          style="max-width: 540px;">
+          <div class="card mb-3 h-100" style="border: dashed 2px #ccc;">
+            <div class="row g-0 h-100">
+              <div class="col-12" style="min-height:100px">
+                <div class="card-body text-center position-absolute top-50 start-50 translate-middle">
+                  <svg style="color:#ccc;" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor"
+                    class="bi bi-plus" viewBox="0 0 16 16">
+                    <path
+                      d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                  </svg>
+                  <h1 class="h5">Agregar dirección</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% for address in addresses %}
+      <div class="col">
+        <div class="card pb-3 h-100">
+          <div class="card-header bg-white small text-muted text-lg-center">
+            {% if address.default %}
+              Predeterminada
+            {% endif %}
+            &nbsp;
+          </div>
+          <div class="card-body small pb-1">
+            <p class="card-text m-0 fw-bold">{{address.full_name}}</p>
+            <p class="card-text m-0">{{address.address_line_1}}</p>
+            {% if address.address_line_2 %}
+              <p class="card-text m-0">{{address.address_line_2}}</p>
+            {% endif %}              
+            <p class="card-text m-0">{{address.city}}</p>
+            <p class="card-text m-0">{{address.postcode}}</p>
+            <p class="card-text m-0">{{address.phone_number}}</p>
+            {% if address.delivery_instructions %}
+              <p class="card-text m-0"><u>Instrucciones de entrega:</u> <br> <i>{{address.delivery_instructions}}</i></p>
+            {% endif %}
+            <br>
+            <div class="position-absolute bottom-0 pb-2 card-footer small bg-white">
+              <a href="{% url 'account:edit_address' address.id %}" class="text-decoration-none">Editar</a>
+              |
+              <a href="{% url 'account:delete_address' address.id %}" class="text-decoration-none">Eliminar</a>
+              {% if address.default %}
+              | <a href="{% url 'account:set_default' address.id %}" class="text-decoration-none">Desmarcar predeterminada</a>
+              {% else %}
+              | <a href="{% url 'account:set_default' address.id %}" class="text-decoration-none">Marcar predeterminada</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock content %}

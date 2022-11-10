@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from account.models import UserBase
+from account.models import Address, Customer
 from basket.basket import Basket
 
 from .forms import OrderForm
@@ -20,7 +20,7 @@ def order(request):
     if request.method == 'POST':
         return add(request)
     else:
-        user = get_object_or_404(UserBase, user_name=request.user)
+        user = get_object_or_404(Customer, name=request.user)
         if user.first_name and user.last_name:
             full_name = f'{user.first_name} {user.last_name}'
         else:
@@ -44,7 +44,7 @@ def add(request):
     basket = Basket(request)
     if request.method == 'POST':
         user_id = request.user.id
-        user = get_object_or_404(UserBase, id=user_id)
+        user = get_object_or_404(Customer, id=user_id)
         basket_total = basket.get_total_price()
         order = Order.objects.create(                   # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
             user=user,

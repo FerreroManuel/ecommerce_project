@@ -92,4 +92,31 @@ urlpatterns = [
         TemplateView.as_view(template_name='account/dashboard/delete_confirm.html'),
         name='delete_confirm',
     ),
+    
+    # Addresses
+    path(                       # addresses
+        "addresses/",
+        views.view_address,
+        name="addresses",
+    ),
+    path(                       # add_address
+        "add_address/",
+        views.add_address,
+        name="add_address",
+    ),
+    path(                       # edit_address
+        "addresses/edit/<slug:id>/",
+        views.edit_address,
+        name="edit_address",
+    ),
+    path(                       # delete_address
+        "addresses/delete/<slug:id>/",
+        views.delete_address,
+        name="delete_address",
+    ),
+    path(                       # set_default
+        "addresses/set_default/<slug:id>/",
+        views.set_default,
+        name="set_default",
+    ),
 ]
