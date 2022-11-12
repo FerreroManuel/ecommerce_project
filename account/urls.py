@@ -1,6 +1,7 @@
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
+    PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetView,
 )
@@ -8,13 +9,13 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from . import views
-from .forms import PwdResetConfirmForm, PwdResetForm, UserLoginForm
+from .forms import PwdChangeForm, PwdResetConfirmForm, PwdResetForm, UserLoginForm
 
 app_name = 'account'
 
 
 urlpatterns = [
-    # User registration
+    # User registration and login
     path(                       # register
         'register/',
         views.account_register,
@@ -82,15 +83,34 @@ urlpatterns = [
         views.edit_details,
         name='edit_details',
     ),
+    path(                       # pwd_change
+        'profile/edit/password/',
+        PasswordChangeView.as_view(
+            template_name='account/edit/password_change.html',
+            success_url='confirm',
+            form_class=PwdChangeForm,
+        ),
+        name='pwd_change',
+    ),
+    path(                       # pwd_change_confirm
+        'profile/edit/password/confirm/',
+        views.pwd_change_confirm,
+        name='pwd_change_confirm',
+    ),
     path(                       # delete_user
         'profile/delete_user/',
         views.delete_user,
         name='delete_user',
     ),
-    path(                       # delete_confirm
-        'profile/delete_confirm/',
-        TemplateView.as_view(template_name='account/dashboard/delete_confirm.html'),
-        name='delete_confirm',
+    path(                       # delete_confirmation
+        'profile/delete_user/confirmation',
+        views.delete_confirmation,
+        name='delete_confirmation'
+    ),
+    path(                       # delete_confirmed
+        'profile/delete_confirmed/',
+        TemplateView.as_view(template_name='account/edit/delete_confirmed.html'),
+        name='delete_confirmed',
     ),
     
     # Addresses
@@ -118,5 +138,24 @@ urlpatterns = [
         "addresses/set_default/<slug:id>/",
         views.set_default,
         name="set_default",
+    ),
+
+    # Wish list
+    path(                       # orders
+        'orders/',
+        views.orders,
+        name='orders'
+    ),
+
+    # Wish list
+    path(                       # wishlist
+        "wishlist/",
+        views.wishlist,
+        name="wishlist",
+    ),
+    path(                       # add_to_wishlist
+        "wishlist/add_to_wishlist/<int:id>/",
+        views.add_to_wishlist,
+        name="add_to_wishlist",
     ),
 ]

@@ -86,18 +86,14 @@
                     <ul class="list-group list-group-flush dropdown-account-link">
                       {% if user.is_authenticated %}
                       <a href="{% url "account:dashboard" %}"
-                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Mi
-                        cuenta</a>
-                      <a href="#"
-                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Mis
-                        pedidos</a>
+                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Mi cuenta</a>
+                      <a href="{% url "account:orders" %}"
+                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Mis pedidos</a>
                       <a href="{% url "account:logout" %}"
-                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Cerrar
-                        sesión</a>
+                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Cerrar sesión</a>
                       {% else %}
                       <a href="{% url "account:login" %}"
-                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Iniciar
-                        sesión</a>
+                        class="dropdown-item text-reset small list-group-item p-0 pb-1 border-0 dropdown-account-link">Iniciar sesión</a>
                       {% endif %}
                     </ul>
                   </div>
@@ -184,7 +180,7 @@
             <ul class="list-group list-group-flush dropdown-account-link">
               {% if user.is_authenticated %}
               <a href="{% url "account:dashboard" %}" class="dropdown-item">Mi cuenta</a>
-              <a href="{% url "account:dashboard" %}" class="dropdown-item">Mis pedidos</a>
+              <a href="{% url "account:orders" %}" class="dropdown-item">Mis pedidos</a>
               <a href="{% url "account:logout" %}" class="dropdown-item">Cerrar sesión</a>
               {% else %}
               <a href="{% url "account:login" %}" class="dropdown-item">Iniciar sesión</a>

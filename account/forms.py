@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm,
+    PasswordChangeForm,
     PasswordResetForm,
     SetPasswordForm,
 )
@@ -39,12 +40,14 @@ class RegistrationForm(forms.ModelForm):
     )
     password = forms.CharField(
         label=_("Password"),
+        widget=forms.PasswordInput(),
         error_messages={
             "required": _("Password field is required"),
         },
     )
     password2 = forms.CharField(
         label=_("Repeat password"),
+        widget=forms.PasswordInput(),
         error_messages={
             "required": _("Repeat password field is required"),
         },
@@ -118,7 +121,7 @@ class UserLoginForm(AuthenticationForm):
                 "class": "form-control mb-3",
                 "placeholder": "Email",
                 "id": "email",
-            }
+            },
         ),
     )
     password = forms.CharField(
@@ -128,7 +131,7 @@ class UserLoginForm(AuthenticationForm):
                 "class": "form-control mb-3",
                 "placeholder": _("Password"),
                 "id": "login-pwd",
-            }
+            },
         ),
     )
 
@@ -155,7 +158,6 @@ class UserEditForm(forms.ModelForm):
                 "class": "form-control mb3",
                 "placeholder": _("Name"),
                 "id": "form-name",
-                "readonly": "readonly",
             },
         ),
     )
@@ -203,6 +205,27 @@ class PwdResetForm(PasswordResetForm):
 
 
 class PwdResetConfirmForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label=_("New password"),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control mb-3", "placeholder": _("New password"), "id": "form-newpass1"}
+        ),
+    )
+    new_password2 = forms.CharField(
+        label=_("Repeat password"),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control mb-3", "placeholder": _("Repeat password"), "id": "form-newpass2"}
+        ),
+    )
+
+
+class PwdChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        label=_("Old password"),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control mb-3", "placeholder": _("Old password"), "id": "form-oldpass"}
+        ),
+    )
     new_password1 = forms.CharField(
         label=_("New password"),
         widget=forms.PasswordInput(
@@ -340,3 +363,6 @@ class UserAddressForm(forms.ModelForm):
         self.fields["delivery_instructions"].required = False
 
 
+class AccountDeleteForm(UserLoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -39,3 +39,4 @@ class ProductImageAdmin(admin.ModelAdmin):
         ProductImageInline,
         ProductSpecificationValueInline,
     ]
+    prepopulated_fields = {'slug': ('title',)}

@@ -21,14 +21,14 @@ def order(request):
         return add(request)
     else:
         user = get_object_or_404(Customer, name=request.user)
-        if user.first_name and user.last_name:
-            full_name = f'{user.first_name} {user.last_name}'
-        else:
-            full_name = None
+        # if user.first_name and user.last_name:
+        #     full_name = f'{user.first_name} {user.last_name}'
+        # else:
+        #     full_name = None
         basket = Basket(request)
         total = basket.get_total_price()
         order_form = OrderForm(data={
-            'full_name': full_name,
+            'full_name': user.name,
             'address1': user.address_line_1,
             'address2': user.address_line_2,
             # 'city': user.city,                # Sólo envíos a Rosario x el momento (cambiar forms si se activa)

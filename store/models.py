@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from account.models import Customer
+
 
 class Category(MPTTModel):
     """
@@ -133,6 +135,11 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+    users_wishlist = models.ManyToManyField(
+        Customer,
+        related_name="users_wishlist",
+        blank=True,
+    )
 
     
     class Meta:

@@ -11,8 +11,18 @@
 
 {% block content %}
 
-<div class="container">
 
+{% if messages %}
+  <div class="container">
+    <div class="alert alert-warning" role="alert">
+      {% for message in messages %}
+       {{ message|safe }} - <a href="{% url 'account:wishlist' %}" class="alert-link">Ir a mis favoritos</a>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="container">
   <div class="row g-3">
     <div class="col-md-5 ps-3 col-lg-5 order-md-last p-0 order-1">
       <div class="d-grid gap-2">
@@ -35,8 +45,15 @@
         <hr>
         <button type="button" id="add-button" value="{{product.id}}" class="btn btn-success fw500">Agregar al
           carrito</button>
-        <button type="button" id="fav-button" value="{{product.id}}" class="btn btn-light fw500">Agregar a
-          favoritos</button>
+        {% if wishlist %}
+        {% if product in wishlist %}
+        <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
+          aria-disabled="true">Eliminar de favoritos</a>
+        {% endif %}
+        {% else %}
+        <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
+          aria-disabled="true">Agregar a favoritos</a>
+        {% endif %}
       </div>
 
       <p>
@@ -47,7 +64,6 @@
     </div>
 
     <div class="col-md-7 col-lg-7 p-0">
-
       <div class="card mb-3 border-0">
         <div class="row g-0">
           <div class="col-md-12">
@@ -56,20 +72,20 @@
               <h1 class="mb-0 h2 pe-4 pb-4">{{ product.title }}</h1>
               <div class="bg-light">
                 {% for image in product.product_image.all %}
-                  {% if image.is_feature %}
-                    <img class="img-fluid mx-auto d-block" width="200px" alt="{{ image.alt_text }}"src="{{ image.image.url }}">
-                  {% else %}
-                    <img class="img-fluid d-block-inline pt-3" width="100px" alt="{{ image.alt_text }}"src="{{ image.image.url }}">
-                  {% endif %}
+                {% if image.is_feature %}
+                <img class="img-fluid mx-auto d-block" width="200px" alt="{{ image.alt_text }}"
+                  src="{{ image.image.url }}">  
+                {% else %}
+                <img class="img-fluid d-block-inline pt-3" width="100px" alt="{{ image.alt_text }}"
+                  src="{{ image.image.url }}">
+                {% endif %}
                 {% endfor %}
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 </div>
 
