@@ -18,7 +18,11 @@ def category_list(request, category_slug=None):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
-    wishlist = Product.objects.filter(users_wishlist=request.user)
+    session = request.session
+    if '_auth_user_id' in session:
+        wishlist = Product.objects.filter(users_wishlist=request.user)
+    else:
+        wishlist = False
     return render(request, 'store/product_detail.html', {'product': product, 'wishlist': wishlist})
 
 

@@ -45,14 +45,15 @@
         <hr>
         <button type="button" id="add-button" value="{{product.id}}" class="btn btn-success fw500">Agregar al
           carrito</button>
-        {% if wishlist %}
-        {% if product in wishlist %}
-        <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
-          aria-disabled="true">Eliminar de favoritos</a>
-        {% endif %}
+        {% if wishlist == False %}
         {% else %}
-        <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
-          aria-disabled="true">Agregar a favoritos</a>
+          {% if product in wishlist %}
+            <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
+            aria-disabled="true">Eliminar de favoritos</a>
+          {% else %}
+            <a href="{% url 'account:add_to_wishlist' product.id %}" class="btn btn-light fw500" role="button"
+            aria-disabled="true">Agregar a favoritos</a>
+          {% endif %}
         {% endif %}
       </div>
 
