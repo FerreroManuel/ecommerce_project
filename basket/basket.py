@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.conf import settings
 
+from checkout.models import DeliveryOptions
 from store.models import Product
 
 
@@ -15,7 +16,6 @@ class Basket():
 
         self.session = request.session
         basket = self.session.get(settings.BASKET_SESSION_ID)
-        self.shipping = Decimal(0.00)
         if settings.BASKET_SESSION_ID not in request.session:
             basket = self.session[settings.BASKET_SESSION_ID] = {}
         self.basket = basket
@@ -56,20 +56,38 @@ class Basket():
 
     def get_subtotal_price(self):
         """
-        Obtiene los totales de todos los productos y devuelve el total
+        Obtiene los totales de todos los productos y retorna el total
         """
         return sum(Decimal(item['price']) * item['qty'] for item in self.basket.values())
 
 
+    def get_delivery_price(self):
+        """
+        Obtiene el precio del envío de la sesión y lo retorna
+        """
+        if 'purchase' in self.session:
+            delivery_price = DeliveryOptions.objects.get(id=self.session['purchase']['delivery_id']).delivery_price
+        else:
+            delivery_price = 0
+        return Decimal(delivery_price)
+
+
     def get_total_price(self):
         """
-        Obtiene el subtotal, le suma el envío y devuelve el total
+        Obtiene el subtotal, le suma el envío y retorna el total
         """
         subtotal = self.get_subtotal_price()
-        if subtotal == 0:
-            total = Decimal(0.00)
+        if 'purchase' in self.session:
+            shipping = DeliveryOptions.objects.get(id=self.session['purchase']['delivery_id']).delivery_price
         else:
-            total = subtotal + Decimal(self.shipping)
+            shipping = Decimal(0)
+        total = subtotal + Decimal(shipping)
+        return Decimal(total)
+
+
+    def basket_update_delivery(self, deliveryprice=0):
+        subtotal = sum(Decimal(item['price']) * item['qty'] for item in self.basket.values())
+        total = subtotal + Decimal(deliveryprice)
         return total
 
 
@@ -85,6 +103,8 @@ class Basket():
         Elimina el carrito de la sesión
         """
         del self.session[settings.BASKET_SESSION_ID]
+        del self.session["address"]
+        del self.session["purchase"]
         self.save_session()
 
 

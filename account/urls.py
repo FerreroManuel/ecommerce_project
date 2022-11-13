@@ -140,7 +140,7 @@ urlpatterns = [
         name="set_default",
     ),
 
-    # Wish list
+    # Orders
     path(                       # orders
         'orders/',
         views.orders,

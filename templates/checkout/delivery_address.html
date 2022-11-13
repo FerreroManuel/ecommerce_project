@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Dirección de envío
+{% endblock title %}
+
+{% block stylesheet %}
+    {% static 'checkout/css/checkout.css' %}
+{% endblock stylesheet %}
+
+
+{% block content %}
+
+
+<div class="container">
+  <div class="col-12">
+    <h1 class="h2">Direcciones de envío</h1>
+  </div>
+  <div class="col-12">
+    <p>Seleccione una dirección donde enviar su pedido</p>
+  </div>
+  <hr />
+</div>
+
+
+<div class="container">
+  <div class="row g-3">
+    {% if addresses|length == 0 %}
+      <div class="col-12">
+        No tiene ninguna dirección registrada. <a href="{% url 'account:add_address' %}">Agregar dirección</a>.
+      </div>
+    {% else %}
+      <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+
+        {% comment %} SUB TOTAL {% endcomment %}
+        <div class="d-flex bd-highlight ms-0">
+          <div class="p-2 flex-grow-1 bd-highlight">Sub Total:</div>
+          <div class="p-2 bd-highlight">
+            <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price}}</span>
+          </div>
+        </div>
+
+        {% comment %} DELIVERY PRICE {% endcomment %}
+        <div class="d-flex bd-highlight">
+          <div class="p-2 flex-grow-1 bd-highlight">
+            Costo de envío:
+          </div>
+          <div class="p-2 bd-highlight">
+            <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price}}</span>
+          </div>
+        </div>
+
+        {% comment %} TOTAL {% endcomment %}
+        <div class="d-flex bd-highlight">
+          <div class="p-2 flex-grow-1 bd-highlight">
+            Total:
+          </div>
+          <div class="p-2 bd-highlight">
+            <span class="fw-bold h5">$ </span><span id="total" class="fw-bold h5">{{basket.get_total_price}}</span>
+          </div>
+        </div>
+
+        {% comment %} PAY BUTTON {% endcomment %}
+        <a role="button" href="{% url 'checkout:payment_selection' %}" class="btn btn-success fw-bold w-100" type="button">Confirmar envío</a>
+      </div>
+
+      <div class="col-md-7 col-lg-8">
+        {% for address in addresses %}
+          {% if not address.default %}
+          {% endif %}
+          <div class="card mb-3 border-1 rounded-0 product-item me-md-4" data-index="{{option.id}}">
+            <div class="row g-0">
+              <div class="col">
+                <div class="card pb-3 rounded-0">
+                  <div class="card-header bg-white small text-muted">
+                    {% if address.default %}
+                      Seleccionada
+                    {% endif %}
+                    &nbsp;
+                  </div>
+                  <div class="card-body small pb-1">
+                    <p class="card-text m-0 fw-bold">{{address.full_name}}</p>
+                    <p class="card-text m-0">{{address.address_line}}</p>
+                    <p class="card-text m-0">{{address.address_line2}}</p>
+                    <p class="card-text m-0">{{address.city}}</p>
+                    <p class="card-text m-0">{{address.postcode}}</p>
+                    <p class="card-text m-0">{{address.phone_number}}</p>
+                    <div class="pt-3">
+                      <a href="{% url 'account:edit_address' address.id %}" class="text-decoration-none">Editar</a>
+                      {% if not address.default %}
+                        | <a href="{% url 'account:set_default' address.id %}" class="text-decoration-none">Seleccionar</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+
+{% endblock content %}

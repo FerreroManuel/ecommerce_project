@@ -16,6 +16,10 @@ from .forms import AccountDeleteForm, RegistrationForm, UserAddressForm, UserEdi
 from .models import Address, Customer
 from .tokens import account_activation_token
 
+                                                        ###############################
+                                                        # SEGUIR AGREGANDO LOS EXCEPT #
+                                                        ###############################
+
 
 def account_register(request):
 
@@ -136,9 +140,12 @@ def add_address(request):
 
 
 @login_required
-def edit_address(request, id):
+def edit_address(request, id):                                # AGREGAR MESSAGES AL EXCEPT
     if request.method == "POST":
-        address = Address.objects.get(pk=id, customer=request.user)
+        try:
+            address = Address.objects.get(pk=id, customer=request.user)
+        except Address.DoesNotExist:
+            return redirect("account:addresses")
         address_form = UserAddressForm(instance=address, data=request.POST)
         if address_form.is_valid():
             address_form.save()
@@ -149,26 +156,37 @@ def edit_address(request, id):
     return render(request, "account/edit/edit_addresses.html", {"form": address_form})
 
 
-@login_required
-def delete_address(request, id):
-    address = Address.objects.filter(pk=id, customer=request.user).delete()
+@login_required(login_url=reverse_lazy("account:login"))
+def delete_address(request, id):                                # AGREGAR MESSAGES AL EXCEPT
+    try:
+        address = Address.objects.filter(pk=id, customer=request.user).delete()
+    except Address.DoesNotExist:
+        return redirect("account:addresses")
     return redirect("account:addresses")
 
 
-@login_required
-def set_default(request, id):
-    address = Address.objects.get(pk=id, customer=request.user)
+@login_required(login_url=reverse_lazy("account:login"))
+def set_default(request, id):                                   # AGREGAR MESSAGES AL EXCEPT
+    try:
+        address = Address.objects.get(pk=id, customer=request.user)
+    except Address.DoesNotExist:
+        return redirect("account:addresses")
     if address.default:
         Address.objects.filter(pk=id, customer=request.user).update(default=False)
     else:
         Address.objects.filter(customer=request.user, default=True).update(default=False)
         Address.objects.filter(pk=id, customer=request.user).update(default=True)
+    
+    # Si la URL anterior es delivery_address:
+    if 'delivery_address' in request.META.get("HTTP_REFERER"):
+        return redirect("checkout:delivery_address")
+        
     return redirect("account:addresses")
 
 
 # --------- ORDERS ---------
 
-@login_required
+@login_required(login_url=reverse_lazy("account:login"))
 def orders(request):
     orders, orders_paid = user_orders(request)
     return render(request, "account/dashboard/orders.html", {"orders": orders, "orders_paid": orders_paid})

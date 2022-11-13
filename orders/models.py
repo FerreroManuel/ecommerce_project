@@ -12,6 +12,10 @@ class Order(models.Model):
         on_delete=models.CASCADE,
         related_name='order_user',
     )
+    email = models.CharField(
+        max_length=255,
+        blank=True
+    )
     full_name = models.CharField(
         max_length=50,
     )
@@ -29,8 +33,12 @@ class Order(models.Model):
     phone = models.CharField(
         max_length=100,
     )
-    postcode = models.CharField(
+    postal_code = models.CharField(
         max_length=12,
+    )
+    country_code = models.CharField(
+        max_length=4,
+        blank=True,
     )
     created = models.DateTimeField(
         auto_now_add=True,
@@ -44,6 +52,10 @@ class Order(models.Model):
     )
     order_key = models.CharField(
         max_length=200,
+    )
+    payment_option = models.CharField(
+        max_length=200,
+        blank=True,
     )
     billing_status = models.BooleanField(
         default=False,
