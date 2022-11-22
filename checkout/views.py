@@ -2,17 +2,17 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
 from paypalcheckoutsdk.orders import OrdersGetRequest
 
 from account.models import Address
 from basket.basket import Basket
 from orders.models import Order, OrderItem
 
+from .mercado_pago import PAYMENT_STATUS, sdk
 from .models import DeliveryOptions, PaymentSelections
-from .paypal import PayPalClient
 
 
 @login_required(login_url=reverse_lazy("account:login"))
@@ -60,7 +60,6 @@ def delivery_address(request):
     return render(request, 'checkout/delivery_address.html', {"addresses": addresses})
         
 
-
 @login_required
 def payment_selection(request):
     if 'address' not in request.session:
@@ -72,48 +71,103 @@ def payment_selection(request):
 
 @login_required
 def payment_complete(request):
-    PPClient = PayPalClient()
-
+    """
+    Recibe la información del formulario de MercadoPago y lo guarda en la sesión
+    """
+    session = request.session    
     body = json.loads(request.body)
+
+    payment_data = {
+        "transaction_amount": float(body["transaction_amount"]),
+        "token": body["token"],
+        # "description": request.POST.get("description"),
+        "installments": int(body["installments"]),
+        "payment_method_id": body["payment_method_id"],
+        "payer": {
+            "email": body["payer"]["email"],
+            "identification": {
+                "type": body["payer"]["identification"]["type"], 
+                "number": body["payer"]["identification"]["number"],
+            },
+            # "first_name": request.POST.get("cardholderName"),
+        },
+    }
+
+    payment_response = sdk.payment().create(payment_data)
+    payment = payment_response["response"]
     
-    data = body['OrderID']
-    user_id = request.user.id
+    if 'mercadopago' not in request.session:
+        session['mercadopago'] = {'response': payment}
+    else:
+        session['mercadopago']['response'] = payment
+        session.modified = True
 
-    requestorder = OrdersGetRequest(data)
-    response = PPClient.client.execute(requestorder)
-
-    purchase_units = response.result.purchase_units[0]
-    total_paid = purchase_units.amount.value
-
-    basket = Basket(request)
-    order = Order.objects.create(
-        user_id=user_id,
-        full_name=purchase_units.shipping.name.full_name,
-        email=response.result.payer.email_address,
-        address1=purchase_units.shipping.address.address_line_1,
-        address2=purchase_units.shipping.address.admin_area_2,
-        postal_code=purchase_units.shipping.address.postal_code,
-        country_code=purchase_units.shipping.address.country_code,
-        total_paid=total_paid,
-        order_key=response.result.id,
-        payment_option="paypal",
-        billing_status=True,
-    )
-    order_id = order.pk
-
-    for item in basket:
-        OrderItem.objects.create(
-            order_id=order_id,
-            product=item['product'],
-            price=item['price'],
-            quantity=item['qty'],
-        )
-    
-    return JsonResponse('Pago realizado con éxito!', safe=False)
+    return JsonResponse('Pago procesado', safe=False)
 
 
 @login_required
-def payment_succesful(request):
-    basket = Basket(request)
-    basket.clear()
-    return render(request, 'checkout/payment_successful.html', {})
+def payment_response(request):
+    """
+    Elimina de la sesión la información del formulario de Mercadopago y actúa según
+    el estado de la transacción:
+    
+    > Si fue aprobada registra en la base de datos la orden con sus respectivos productos,
+    elimina toda la información de la compra de la sesión y dirige al usuario a lá página
+    correspondiente.
+
+    > Si no fue aprobada dirige al usuario a la página correspondiente.
+    """
+
+    session = request.session
+    mp_response = session['mercadopago']['response']
+    del session["mercadopago"]
+    session.modified = True
+
+    if mp_response["status"] == "approved":
+        basket = Basket(request)
+        user_id = request.user.id
+
+        order = Order.objects.create(
+            user_id=user_id,
+            full_name='',
+            email=mp_response["payer"]["email"],
+            address1='',
+            address2='',
+            postal_code='',
+            country_code='AR',
+            total_paid=mp_response["transaction_details"]["total_paid_amount"],
+            order_key=mp_response["id"],
+            payment_option=mp_response["payment_type_id"],
+            billing_status=True,
+        )
+        
+        order_id = order.pk
+
+        for item in basket:
+            OrderItem.objects.create(
+                order_id=order_id,
+                product=item['product'],
+                price=item['price'],
+                quantity=item['qty'],
+        )
+
+        basket.clear()
+        return render(request, 'checkout/payment_successful.html', {})
+    else:
+        if str(mp_response['status_detail']) in PAYMENT_STATUS:
+            status_detail = PAYMENT_STATUS[str(mp_response['status_detail'])]
+        else:
+            status_detail = f'Error desconocido ({mp_response["status_detail"]})'
+        
+        message = f"""
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi
+        bi-x-circle-fill" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 
+        2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 
+        0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+        </svg>
+        <b>Se produjo el siguiente error al intentar realizar el pago:</b>
+        <ul><br><li>{status_detail}</li></ul>
+        """
+        messages.success(request, message)
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])

@@ -31,13 +31,15 @@
         No tiene ninguna dirección registrada. <a href="{% url 'account:add_address' %}">Agregar dirección</a>.
       </div>
     {% else %}
+
+      {% comment %} PRICES {% endcomment %}
       <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
 
         {% comment %} SUB TOTAL {% endcomment %}
         <div class="d-flex bd-highlight ms-0">
           <div class="p-2 flex-grow-1 bd-highlight">Sub Total:</div>
           <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price}}</span>
+            <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price|floatformat:2}}</span>
           </div>
         </div>
 
@@ -47,7 +49,7 @@
             Costo de envío:
           </div>
           <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price}}</span>
+            <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price|floatformat:2}}</span>
           </div>
         </div>
 
@@ -57,14 +59,15 @@
             Total:
           </div>
           <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="total" class="fw-bold h5">{{basket.get_total_price}}</span>
+            <span class="fw-bold h5">$ </span><span id="total" class="fw-bold h5">{{basket.get_total_price|floatformat:2}}</span>
           </div>
         </div>
 
-        {% comment %} PAY BUTTON {% endcomment %}
+        {% comment %} BUTTON {% endcomment %}
         <a role="button" href="{% url 'checkout:payment_selection' %}" class="btn btn-success fw-bold w-100" type="button">Confirmar envío</a>
       </div>
 
+      {% comment %} ADDRESSES {% endcomment %}
       <div class="col-md-7 col-lg-8">
         {% for address in addresses %}
           {% if not address.default %}

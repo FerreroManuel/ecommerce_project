@@ -24,6 +24,7 @@
   <hr />
 </div>
 
+{% comment %} PRICES {% endcomment %}
 <div class="container">
   <div class="row g-3">
     <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
@@ -34,7 +35,7 @@
           Sub Total:
         </div>
         <div class="p-2 bd-highlight">
-          <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price}}</span>
+          <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price|floatformat:2}}</span>
         </div>
       </div>
 
@@ -44,7 +45,7 @@
           Costo de envío:
         </div>
         <div class="p-2 bd-highlight">
-          <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price}}</span>
+          <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price|floatformat:2}}</span>
         </div>
       </div>
 
@@ -54,24 +55,45 @@
           Total:
         </div>
         <div class="p-2 bd-highlight">
-          <span class="fw-bold h5">$ </span><span id="total"class="fw-bold h5">{{basket.get_total_price}}</span>
+          <span class="fw-bold h5">$ </span><span id="total"class="fw-bold h5">{{basket.get_total_price|floatformat:2}}</span>
         </div>
       </div>
   
     </div>
 
-    {% comment %} PAYPAL {% endcomment %}
+    {% comment %} MERCADOPAGO BRICK {% endcomment %}
     <div class="col-md-7 col-lg-8 pe-0 pe-md-5">
-      <div id="paypal-button-container"></div>
-    </div>
+      {% if messages %}
+        <div class="alert alert-danger" alert-{{ message.tags }} role="alert">
+          {% for message in messages %}
+            {{message|safe}}
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <div id="paymentBrick_container">
+        <div id="loading" class="text-center m-5">
+          <div class="align-items-center">
+            <strong>Cargando métodos de pago...</strong><br>
+            <div class="spinner-border text-primary mt-2" style="width: 3rem; height: 3rem;" role="status" aria-hidden="true"></div>
+        </div>
+      </div>
+      
+    </div>    
   </div>
 </div>
 
+<!-- Instalación del SDK -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 
+<!-- Código de seguridad de MercadoPago -->
+<script src="https://www.mercadopago.com/v2/security.js" view="home"></script>
 
-{% comment %} PAYPAL SDK {% endcomment %}
-<script src="https://www.paypal.com/sdk/js?client-id=AWKEzlQqiQIfM8fuJvQdCRcC0zlLYZEuwst6o9xNDtseEUpa2tXfagpeN2MJewu-QUBHXkBgN4E3F7U0&currency=USD"></script>
+<!-- MercadoPago Brick -->
 <script>
+  const LOADING = document.getElementById("loading");
+
+  /* Obtención de coockies */
   function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -86,53 +108,72 @@
     }
     return cookieValue;
   }
+
+  /* Instanciación del token CSRF */
   var csrftoken = getCookie('csrftoken');
 
-  function initPayPalButton() {
-    paypal.Buttons({
-      style: {
-        shape: 'rect',
-        color: 'gold',
-        layout: 'vertical',
-        label: 'paypal',
+  /* Inicialización del SDK */
+  const mp = new MercadoPago("TEST-ab05c99c-3e16-45c6-999e-43f7528d9571");
 
+  /* Instanciación de Brick */
+  const bricksBuilder = mp.bricks();
+
+  /* Renderización de Brick */
+  const renderPaymentBrick = async (bricksBuilder) => {
+    const settings = {
+      initialization: {
+        amount: '{{basket.get_total_price}}', // monto a ser pago
       },
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '{{basket.get_total_price}}'
-            }
-          }]
-        });
+      customization: {
+        paymentMethods: {
+          creditCard: 'all', // para seleccionar sólo algunas pasar un array. Ej.: [ 'visa', 'master' ]
+          debitCard: 'all',
+        },
       },
-      onApprove: (data, actions) => {    
-        return actions.order.capture().then(function (orderData) {
-          
-        }).then( function () {
-          var url = "{% url 'checkout:payment_complete' %}"
-          return fetch(url, {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({
-              OrderID: data.orderID
-            })
-          }).then(function () {
-            location.href = '{% url 'checkout:payment_successful' %}';
-          })
-      })
+      callbacks: {
+        onReady: () => {
+          /*
+            Callback llamado cuando Brick está listo
+            Aquí puedes ocultar loadings de su sitio, por ejemplo.
+          */
+          // LOADING.classList.remove('loading--show');
+          LOADING.style.display = 'none';
+        },
+        onSubmit: ({ selectedPaymentMethod, formData }) => {
+          // callback llamado cuando el usuario haz clic en el botón enviar los datos
+            return new Promise((resolve, reject) => {
+              fetch("{% url 'checkout:payment_complete' %}", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(formData)
+              })
+                .then((response) => {
+                  // recibir el resultado del pago 
+                  resolve();
+                  location.href = "{% url 'checkout:payment_response' %}";
+                })
+                .catch((error) => {
+                  // tratar respuesta de error al intentar crear el pago
+                  reject();
+                })
+            });
+        },
+        onError: (error) => {
+          // callback llamado para todos los casos de error de Brick
+          console.error(error);
+        },
       },
-
-
-
-    }).render('#paypal-button-container');
-  }
-  initPayPalButton();
-
+    };
+    window.paymentBrickController = await bricksBuilder.create(
+      'payment',
+      'paymentBrick_container',
+      settings
+    );
+   };
+   renderPaymentBrick(bricksBuilder);
 </script>
-
-
+    
 {% endblock content %}
