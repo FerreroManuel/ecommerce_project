@@ -2,9 +2,9 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import redirect, render
-from django.urls import reverse, reverse_lazy
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse_lazy
 from paypalcheckoutsdk.orders import OrdersGetRequest
 
 from account.models import Address
@@ -12,7 +12,7 @@ from basket.basket import Basket
 from orders.models import Order, OrderItem
 
 from .mercado_pago import PAYMENT_STATUS, sdk
-from .models import DeliveryOptions, PaymentSelections
+from .models import DeliveryOptions
 
 
 @login_required(login_url=reverse_lazy("account:login"))
@@ -74,13 +74,22 @@ def payment_complete(request):
     """
     Recibe la información del formulario de MercadoPago y lo guarda en la sesión
     """
-    session = request.session    
+    session = request.session
+
+    user = request.user
+    address = Address.objects.get(pk=request.session['address']['address_id'], customer=user)
+
     body = json.loads(request.body)
+
+    from pprint import pprint
+    print("\n\n\n")
+    pprint(body)
+    print("\n\n\n")
 
     payment_data = {
         "transaction_amount": float(body["transaction_amount"]),
         "token": body["token"],
-        # "description": request.POST.get("description"),
+        "description": 'MF! Store',
         "installments": int(body["installments"]),
         "payment_method_id": body["payment_method_id"],
         "payer": {
@@ -88,8 +97,9 @@ def payment_complete(request):
             "identification": {
                 "type": body["payer"]["identification"]["type"], 
                 "number": body["payer"]["identification"]["number"],
+                # "first_name": body["payer"]["first_name"],
+                # "phone": {"number": int(address.phone_number)}
             },
-            # "first_name": request.POST.get("cardholderName"),
         },
     }
 
@@ -126,15 +136,18 @@ def payment_response(request):
     if mp_response["status"] == "approved":
         basket = Basket(request)
         user_id = request.user.id
+        address = Address.objects.get(pk=session['address']['address_id'])
 
         order = Order.objects.create(
             user_id=user_id,
-            full_name='',
             email=mp_response["payer"]["email"],
-            address1='',
-            address2='',
-            postal_code='',
-            country_code='AR',
+            full_name=request.user.name,
+            address1=address.address_line_1,
+            address2=address.address_line_2,
+            city=address.city,
+            phone=address.phone_number,
+            postal_code=address.postcode,
+            country_code=address.country,
             total_paid=mp_response["transaction_details"]["total_paid_amount"],
             order_key=mp_response["id"],
             payment_option=mp_response["payment_type_id"],

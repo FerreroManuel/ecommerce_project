@@ -113,9 +113,8 @@ Mi carrito
       success: function (json) {
         $('.product-item[data-index="' + prodid + '"]')
           .remove(); // Elimina el div que contiene el artículo
-        document.getElementById("subtotal").innerHTML = json.subtotal;
-        document.getElementById("total").innerHTML = json.total;
-        document.getElementById("basket-qty").innerHTML = json.qty
+          document.getElementById("subtotal").innerHTML = json.subtotal;
+          document.getElementById("basket-qty").innerHTML = json.qty
       },
       error: function (xhr, errmsh, err) {}
     });
@@ -135,8 +134,7 @@ Mi carrito
         action: 'post'
       },
       success: function (json) {
-        document.getElementById("subtotal").innerHTML = json.subtotal;
-        document.getElementById("total").innerHTML = json.total;
+        document.getElementById("subtotal").innerHTML = json.subtotal.toFixed(2);
         document.getElementById("basket-qty").innerHTML = json.qty
       },
       error: function (xhr, errmsh, err) {}

@@ -3,6 +3,7 @@ database.json
 
 # User-specific files
 reminder.py
+*.txt
 
 # Django
 *.log
