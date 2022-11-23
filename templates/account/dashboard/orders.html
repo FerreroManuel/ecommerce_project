@@ -22,7 +22,7 @@ Mis direcciones
 
       {% if orders_paid %}
         <div class="container w-100">
-          <h5>Pedidos pagos</h5>
+          <h5>Pedidos</h5>
           {% for order_p in orders_paid %}
             <div class="row g-3">
 
@@ -45,13 +45,13 @@ Mis direcciones
                       <li class="item small">{{order_p.full_name}}</li>
                       <li class="item small">{{order_p.address1}}</li>
                       <li class="item small">{{order_p.address2}}</li>
-                      <li class="item small">{{order_p.post_code}}</li>
+                      <li class="item small">{{order_p.postal_code}}</li>
                     </ul>
                   </div>
 
                 </div>
                 <div class="text-end">
-                  Total a pagar: <span class="fw-bold">$ {{ order_p.total_paid }}</span>
+                  Total pago: <span class="fw-bold">$ {{ order_p.total_paid }}</span>
                 </div>
               </div>
               <div class="col-md-5 col-lg-4 order-md-last p-0 order-3">

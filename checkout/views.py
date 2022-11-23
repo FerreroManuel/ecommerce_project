@@ -3,9 +3,8 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from paypalcheckoutsdk.orders import OrdersGetRequest
 
 from account.models import Address
 from basket.basket import Basket
@@ -81,11 +80,6 @@ def payment_complete(request):
 
     body = json.loads(request.body)
 
-    from pprint import pprint
-    print("\n\n\n")
-    pprint(body)
-    print("\n\n\n")
-
     payment_data = {
         "transaction_amount": float(body["transaction_amount"]),
         "token": body["token"],
@@ -129,9 +123,12 @@ def payment_response(request):
     """
 
     session = request.session
-    mp_response = session['mercadopago']['response']
-    del session["mercadopago"]
-    session.modified = True
+    if 'mercadopago' in session:
+        mp_response = session['mercadopago']['response']
+        del session["mercadopago"]
+        session.modified = True
+    else:
+        return redirect('account:orders')
 
     if mp_response["status"] == "approved":
         basket = Basket(request)
@@ -165,7 +162,8 @@ def payment_response(request):
         )
 
         basket.clear()
-        return render(request, 'checkout/payment_successful.html', {})
+
+        return render(request, 'checkout/payment_successful.html', {"order": order})
     else:
         if str(mp_response['status_detail']) in PAYMENT_STATUS:
             status_detail = PAYMENT_STATUS[str(mp_response['status_detail'])]
