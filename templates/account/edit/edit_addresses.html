@@ -15,8 +15,13 @@ Mis direcciones
 
 <div class="container">
   <div class="col-6 mx-auto">
-    <h1 class="h3">Crear/editar dirección</h1>
-    <div>Crear o editar una dirección de envío.</div>
+    {% if action == 'ADD' %}
+      <h1 class="h3">Agregar nueva dirección</h1>
+      <div>Agregar una nueva dirección de envío.</div>
+    {% else %}
+      <h1 class="h3">Editar dirección</h1>
+      <div>Editar una dirección de envío.</div>
+    {% endif %}
     <hr />
     <form name="address_form" class="account-form" method="post" enctype="multipart/form-data">
       {% if form.errors %}
@@ -37,16 +42,27 @@ Mis direcciones
       {{ form.city }}
       <label class="small fw-bold">{{ form.postcode.label}}</label>
       {{ form.postcode }}
-      <label class="small fw-bold">{{ form.address_line_1.label}}</label>
-      {{ form.address_line_1 }}
-      <label class="small fw-bold">{{ form.address_line_2.label}}</label>
-      {{ form.address_line_2 }}
+      <label class="small fw-bold">{{ form.street_name.label}}</label>
+      {{ form.street_name }}
+      <label class="small fw-bold">{{ form.street_number.label}}</label>
+      {{ form.street_number }}
+      <label class="small fw-bold">{{ form.floor.label}}</label>
+      {{ form.floor }}
+      <label class="small fw-bold">{{ form.apartment.label}}</label>
+      {{ form.apartment }}
       <label class="small fw-bold">{{ form.delivery_instructions.label}}</label>
       {{ form.delivery_instructions }}
-      <button class="btn btn-primary btn-block py-2 mb-4 mt-4 fw-bold w-100" type="button" value="Submit"
-        onclick="submitForm()">
-        Agregar dirección
+      {% if action == 'ADD' %}
+        <button class="btn btn-primary btn-block py-2 mb-4 mt-4 fw-bold w-100" type="button" value="Submit"
+          onclick="submitForm()">
+          Agregar dirección
+        </button>      
+      {% else %}
+        <button class="btn btn-primary btn-block py-2 mb-4 mt-4 fw-bold w-100" type="button" value="Submit"
+          onclick="submitForm()">
+          Editar dirección
       </button>
+    {% endif %}
     </form>
 
   </div>
@@ -57,8 +73,8 @@ Mis direcciones
   function submitForm() {
     var form = document.getElementsByName('address_form')[0];
     form.submit(); // Submit the form
-    form.reset(); // Reset all form data
-    return false; // Prevent page refresh
+    form.reset();  // Reset all form data
+    return false;  // Prevent page refresh
   }
 </script>
 

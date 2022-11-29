@@ -14,99 +14,161 @@
 
 
 <div class="container">
-  <div class="col-12">
-    <h1 class="h2">Direcciones de envío</h1>
-  </div>
-  <div class="col-12">
-    <p>Seleccione una dirección donde enviar su pedido</p>
-  </div>
-  <hr />
-</div>
-
-
-<div class="container">
-  <div class="row g-3">
-    {% if addresses|length == 0 %}
-      <div class="col-12">
-        No tiene ninguna dirección registrada. <a href="{% url 'account:add_address' %}">Agregar dirección</a>.
+  {% if messages %}
+      <div class="alert alert-warning" alert-{{ message.tags }} role="alert">
+        {% for message in messages %}
+          {{message|safe}}
+        {% endfor %}
       </div>
-    {% else %}
-
-      {% comment %} PRICES {% endcomment %}
-      <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
-
-        {% comment %} SUB TOTAL {% endcomment %}
-        <div class="d-flex bd-highlight ms-0">
-          <div class="p-2 flex-grow-1 bd-highlight">Sub Total:</div>
-          <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price|floatformat:2}}</span>
-          </div>
-        </div>
-
-        {% comment %} DELIVERY PRICE {% endcomment %}
-        <div class="d-flex bd-highlight">
-          <div class="p-2 flex-grow-1 bd-highlight">
-            Costo de envío:
-          </div>
-          <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price|floatformat:2}}</span>
-          </div>
-        </div>
-
-        {% comment %} TOTAL {% endcomment %}
-        <div class="d-flex bd-highlight">
-          <div class="p-2 flex-grow-1 bd-highlight">
-            Total:
-          </div>
-          <div class="p-2 bd-highlight">
-            <span class="fw-bold h5">$ </span><span id="total" class="fw-bold h5">{{basket.get_total_price|floatformat:2}}</span>
-          </div>
-        </div>
-
-        {% comment %} BUTTON {% endcomment %}
-        <a role="button" href="{% url 'checkout:payment_selection' %}" class="btn btn-success fw-bold w-100" type="button">Confirmar envío</a>
-      </div>
-
-      {% comment %} ADDRESSES {% endcomment %}
-      <div class="col-md-7 col-lg-8">
-        {% for address in addresses %}
-          {% if not address.default %}
+  {% endif %}
+    <div class="row g-3">
+      {% if addresses|length == 0 %}
+        <div class="col-12">
+          {% if delivery_method == 'IS' %}
+          No se encontraron direcciones para retirar. <a href="{% url 'store:product_all' %}"> Ir a la tienda</a>.
+          {% else %}
+            No se encontraron direcciones de envío. <a href="{% url 'checkout:delivery_choices' %}"> Elegir otro tipo de envío</a>.
           {% endif %}
-          <div class="card mb-3 border-1 rounded-0 product-item me-md-4" data-index="{{option.id}}">
-            <div class="row g-0">
-              <div class="col">
-                <div class="card pb-3 rounded-0">
-                  <div class="card-header bg-white small text-muted">
-                    {% if address.default %}
-                      Seleccionada
-                    {% endif %}
-                    &nbsp;
-                  </div>
-                  <div class="card-body small pb-1">
-                    <p class="card-text m-0 fw-bold">{{address.full_name}}</p>
-                    <p class="card-text m-0">{{address.address_line}}</p>
-                    <p class="card-text m-0">{{address.address_line2}}</p>
-                    <p class="card-text m-0">{{address.city}}</p>
-                    <p class="card-text m-0">{{address.postcode}}</p>
-                    <p class="card-text m-0">{{address.phone_number}}</p>
-                    <div class="pt-3">
-                      <a href="{% url 'account:edit_address' address.id %}" class="text-decoration-none">Editar</a>
-                      {% if not address.default %}
-                        | <a href="{% url 'account:set_default' address.id %}" class="text-decoration-none">Seleccionar</a>
+        </div>
+      {% else %}
+        <div class="col-12">
+          {% if delivery_method == 'IS' %}
+            <h1 class="h2">Direcciones de retiro</h1>
+          {% else %}
+            <h1 class="h2">Direcciones de envío</h1>
+          {% endif %}
+        </div>
+        <div class="col-12">
+          {% if delivery_method == 'IS' %}
+            <p>Seleccione una dirección donde retirar su pedido</p>
+          {% else %}
+            <p>Seleccione una dirección donde enviar su pedido</p>
+          {% endif %}
+        </div>
+        <hr />
+      </div>
+
+
+      <div class="container">
+        <div class="row g-3">
+          {% if addresses|length == 0 %}
+            <div class="col-12">
+              No tiene ninguna dirección registrada. <a href="{% url 'account:add_address' %}">Agregar dirección</a>.
+            </div>
+          {% else %}
+
+            {% comment %} PRICES {% endcomment %}
+            <div class="col-md-4 col-lg-4 order-md-last p-0 order-3">
+
+              {% comment %} SUB TOTAL {% endcomment %}
+              <div class="d-flex bd-highlight ms-0">
+                <div class="p-2 flex-grow-1 bd-highlight">Sub Total:</div>
+                <div class="p-2 bd-highlight">
+                  <span class="fw-bold h5">$ </span><span id="sub_total" class="fw-bold h5">{{basket.get_subtotal_price|floatformat:2}}</span>
+                </div>
+              </div>
+
+              {% comment %} DELIVERY PRICE {% endcomment %}
+              <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight">
+                  Costo de envío:
+                </div>
+                <div class="p-2 bd-highlight">
+                  <span class="fw-bold h5">$ </span><span id="delivery_price" class="fw-bold h5">{{basket.get_delivery_price|floatformat:2}}</span>
+                </div>
+              </div>
+
+              {% comment %} TOTAL {% endcomment %}
+              <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight">
+                  Total:
+                </div>
+                <div class="p-2 bd-highlight">
+                  <span class="fw-bold h5">$ </span><span id="total" class="fw-bold h5">{{basket.get_total_price|floatformat:2}}</span>
+                </div>
+              </div>
+
+              {% comment %} BUTTON {% endcomment %}
+              <a role="button" href="{% url 'checkout:payment_selection' %}" class="btn btn-success fw-bold w-100" type="button">Confirmar envío</a>
+            </div>
+
+
+            {% comment %} ADDRESSES {% endcomment %}
+            <div class="col-md-7 col-lg-8">
+              {% for address in addresses %}
+                <div class="card mb-3 border-1 rounded-0 product-item me-md-4" data-index="{{ address.id }}">
+                  <div class="row g-0">
+                    <div class="col-md-2 ps-3 ps-md-4">
+                      {% if delivery_method == 'IS' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-shop mt-2 mb-2" viewBox="0 0 16 16">
+                          <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z"/>
+                        </svg>
+                      {% else %}
+                        {% if address.default %}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-house-door-fill mt-2 mb-2" viewBox="0 0 16 16">
+                            <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5Z"/>
+                          </svg>
+                        {% else %}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-house-door mt-2 mb-2" viewBox="0 0 16 16">
+                            <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146ZM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5Z"/>
+                          </svg>
+                        {% endif %}
+                        <a href="{% url 'account:edit_address' address.id %}" class="text-decoration-none">Editar</a></p>
                       {% endif %}
+                    </div>
+                    <div class="col-md-9 ps-md-1">
+                      <div class="card-body p-1">
+                        <p class="card-text ps-2 mb-1 pt-"><b>{{address.full_name}}</b> ({{address.phone_number}})</p>
+                        <p class="card-text ps-2 pb-3">
+                          {{address.street_name}} {{address.street_number}}
+                          {% if address.floor %}
+                            {{address.floor}} 
+                          {% endif %}
+                          {% if address.apartment %}
+                            {{address.apartment}}
+                          {% endif %}
+                            <br>
+                          {{address.city}}, {{address.state}} ({{address.postcode}})<br>
+                          {% if address.time_window %}
+                            <i><u>Horario de atención: {{address.time_window}}<br></u></i>
+                          {% endif %}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-md-1 ps-md-1">
+                      <input class="align-middle h-100" type="radio" name="deliveryAddress" id="{{address.id}}" value="{{address.id}}">
                     </div>
                   </div>
                 </div>
-                </a>
+              {% endfor %}
               </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  </div>
 
-</div>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endif %}
+
+
+
+<script>
+  $('input[type=radio][name=deliveryAddress]').on('change', function(e) {
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: '{% url "checkout:basket_update_address" %}',
+      data: {
+        deliveryaddress: $(this).val(),
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: "post",
+      },
+      success: function (json) {},
+      error: function (xhr, errmsg, err) {},
+    });
+    
+  });
+</script>
 
 
 {% endblock content %}

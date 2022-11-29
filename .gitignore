@@ -1,8 +1,10 @@
 # Database connection data file
 database.json
+secret_keys.json
 
 # User-specific files
 reminder.py
+MP_RESPONSE.py
 *.txt
 
 # Django

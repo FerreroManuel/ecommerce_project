@@ -6,8 +6,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
-from account.models import Address
+from account.models import Address, WarehouseAddress
 from basket.basket import Basket
+from core.settings.base import SITE_NAME
 from orders.models import Order, OrderItem
 
 from .mercado_pago import PAYMENT_STATUS, sdk
@@ -48,16 +49,34 @@ def delivery_address(request):
         messages.success(request, 'Por favor seleccione un tipo de envío')
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
-    addresses = Address.objects.filter(customer=request.user).order_by("-default")
+    delivery_option = DeliveryOptions.objects.get(pk=session['purchase']['delivery_id'])
 
-    if 'address' not in request.session:
-        session['address'] = {'address_id': str(addresses[0].id)}
+    if delivery_option.delivery_method == 'IS':
+        addresses = WarehouseAddress.objects.filter(is_active=True).order_by("order")
     else:
-        session['address']['address_id'] = str(addresses[0].id)
-        session.modified = True
+        addresses = Address.objects.filter(customer=request.user).order_by("-default")
 
-    return render(request, 'checkout/delivery_address.html', {"addresses": addresses})
+    return render(request, 'checkout/delivery_address.html', {"addresses": addresses, "delivery_method": delivery_option.delivery_method})
+
+
+@login_required
+def basket_update_address(request):
+    basket = Basket(request)
+    if request.POST.get("action") == "post":
+        delivery_address = request.POST.get("deliveryaddress")
         
+        session = request.session
+        if 'address' not in session:
+            session['address'] = {
+                'address_id': delivery_address,
+            }
+        else:
+            session['address']['address_id'] = delivery_address
+            session.modified = True
+
+        response = JsonResponse({})
+        return response
+
 
 @login_required
 def payment_selection(request):
@@ -75,30 +94,74 @@ def payment_complete(request):
     """
     session = request.session
 
-    user = request.user
-    address = Address.objects.get(pk=request.session['address']['address_id'], customer=user)
 
+    basket = Basket(request)
+    deliveryoption = DeliveryOptions.objects.get(pk=session['purchase']['delivery_id'])
+    if deliveryoption.delivery_method == 'IS':
+        address = WarehouseAddress.objects.get(pk=session['address']['address_id'])
+    else:
+        address = Address.objects.get(pk=session['address']['address_id'])
     body = json.loads(request.body)
 
+    # items = []    
+    # print("\n\n\n")
+    # for item in basket:
+    #     product = item['product']
+    #     items.append({
+    #         'id': str(product.id),
+    #         'title': str(product.title),
+    #         'category_id': str(product.category),
+    #         'quantity': int(item['qty']),
+    #         'unit_price': float(item['price']),
+    #     })
+    # print("\n\n\n")
+
     payment_data = {
-        "transaction_amount": float(body["transaction_amount"]),
-        "token": body["token"],
-        "description": 'MF! Store',
-        "installments": int(body["installments"]),
-        "payment_method_id": body["payment_method_id"],
-        "payer": {
-            "email": body["payer"]["email"],
-            "identification": {
-                "type": body["payer"]["identification"]["type"], 
-                "number": body["payer"]["identification"]["number"],
-                # "first_name": body["payer"]["first_name"],
-                # "phone": {"number": int(address.phone_number)}
+        'additional_info': {
+            # 'items': items,
+            'payer': {
+                'first_name': str(request.user.first_name),                             
+                'last_name': str(request.user.last_name),                               
+                'phone': {
+                    'area_code': '',                                                    # MODIFICAR MODEL
+                    'number': '',                                                       # MODIFICAR MODEL
+                },
+                'registration_date': str(request.user.created_at),
+            },
+            'shipments': {
+                'receiver_address': {
+                    'zip_code': str(address.postcode),
+                    'state_name': str(address.state),
+                    'city_name': str(address.city),
+                    'street_name': str(address.street_name),
+                    'street_number': str(address.street_number),
+                    'floor': str(address.floor),
+                    'apartment': str(address.apartment),
+                },
             },
         },
+        'binary_mode': True,
+        'coupon_amount': None,
+        'coupon_code': None,
+        'description': 'Compra online',
+        'installments': int(body['installments']),
+        'payer': {
+            'email': body['payer']['email'],
+            'identification': {
+                'type': body['payer']['identification']['type'], 
+                'number': body['payer']['identification']['number'],
+            },
+            'first_name': str(request.user.first_name),
+            'last_name': str(request.user.last_name),
+        },
+        'payment_method_id': body['payment_method_id'],
+        'statement_descriptor': str(SITE_NAME),
+        'token': body['token'],
+        'transaction_amount': float(body['transaction_amount']),
     }
 
     payment_response = sdk.payment().create(payment_data)
-    payment = payment_response["response"]
+    payment = payment_response['response']
     
     if 'mercadopago' not in request.session:
         session['mercadopago'] = {'response': payment}
@@ -127,20 +190,30 @@ def payment_response(request):
         mp_response = session['mercadopago']['response']
         del session["mercadopago"]
         session.modified = True
+        from pprint import pprint
+        print('\n\n\n')
+        pprint(mp_response)
+        print('\n\n\n')
     else:
         return redirect('account:orders')
 
     if mp_response["status"] == "approved":
         basket = Basket(request)
         user_id = request.user.id
-        address = Address.objects.get(pk=session['address']['address_id'])
+        
+        try:
+            address_id = int(session['address']['address_id'])
+            address = WarehouseAddress.objects.get(pk=address_id)
+            shipping_option = 'Retiro'
+        except ValueError:
+            address = Address.objects.get(pk=session['address']['address_id'])
+            shipping_option = 'Envío'
 
         order = Order.objects.create(
             user_id=user_id,
             email=mp_response["payer"]["email"],
-            full_name=request.user.name,
-            address1=address.address_line_1,
-            address2=address.address_line_2,
+            full_name=request.user.__str__(),
+            address=address.__str__(),
             city=address.city,
             phone=address.phone_number,
             postal_code=address.postcode,
@@ -148,6 +221,7 @@ def payment_response(request):
             total_paid=mp_response["transaction_details"]["total_paid_amount"],
             order_key=mp_response["id"],
             payment_option=mp_response["payment_type_id"],
+            shipping_option=shipping_option,
             billing_status=True,
         )
         

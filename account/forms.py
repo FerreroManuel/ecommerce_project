@@ -22,13 +22,22 @@ class RegistrationForm(forms.ModelForm):
             "required": _("Email field is required"),
         },
     )
-    name = forms.CharField(
-        label=_("Name"),
+    first_name = forms.CharField(
+        label=_("First name"),
         min_length=4,
         max_length=50,
         help_text="*",
         error_messages={
-            "required": _("Name field is required"),
+            "required": _("First name field is required"),
+        },
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        min_length=4,
+        max_length=50,
+        help_text="*",
+        error_messages={
+            "required": _("Last name field is required"),
         },
     )
     phone_number = PhoneNumberField().formfield(
@@ -63,10 +72,17 @@ class RegistrationForm(forms.ModelForm):
                 "id": "email",
             }
         )
-        self.fields["name"].widget.attrs.update(
+        self.fields["first_name"].widget.attrs.update(
             {
                 "class": "form-control mb3",
-                "placeholder": _("Name"),
+                "placeholder": _("First name"),
+                "id": "name",
+            }
+        )
+        self.fields["last_name"].widget.attrs.update(
+            {
+                "class": "form-control mb3",
+                "placeholder": _("Last name"),
                 "id": "name",
             }
         )
@@ -109,7 +125,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ("name", "email", "phone_number")
+        fields = ("first_name", "last_name", "email", "phone_number")
 
 
 class UserLoginForm(AuthenticationForm):
@@ -150,14 +166,25 @@ class UserEditForm(forms.ModelForm):
             },
         ),
     )
-    name = forms.CharField(
-        label=_("Name"),
+    first_name = forms.CharField(
+        label=_("First name"),
         max_length=150,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control mb3",
-                "placeholder": _("Name"),
-                "id": "form-name",
+                "placeholder": _("First name"),
+                "id": "form-first-name",
+            },
+        ),
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Last name"),
+                "id": "form-last-name",
             },
         ),
     )
@@ -177,7 +204,8 @@ class UserEditForm(forms.ModelForm):
         model = Customer
         fields = (
             "email",
-            "name",
+            "first_name",
+            "last_name",
             "phone_number",
         )
 
@@ -185,7 +213,8 @@ class UserEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
-        self.fields["name"].required = True
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
         self.fields["phone_number"].required = True
 
 
@@ -301,25 +330,44 @@ class UserAddressForm(forms.ModelForm):
             },
         ),
     )
-    address_line_1 = forms.CharField(
-        label=_("Address (line 1)"),
+    street_name = forms.CharField(
+        label=_("Street name"),
         max_length=150,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control mb3",
-                "placeholder": _("Address (line 1)"),
-                "id": "form-address1",
+                "placeholder": _("Street name"),
+                "id": "form-street-name",
             },
         ),
     )
-    address_line_2 = forms.CharField(
-        label=_("Address (line 2)"),
-        max_length=150,
+    street_number = forms.IntegerField(
+        label=_("Street number"),
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Street number"),
+                "id": "form-street-number",
+            },
+        ),
+    )
+    floor = forms.IntegerField(
+        label=_("Floor"),
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control mb3",
+                "placeholder": _("Floor"),
+                "id": "form-street-number",
+            },
+        ),
+    )
+    apartment = forms.CharField(
+        label=_("Apartment"),
         widget=forms.TextInput(
             attrs={
                 "class": "form-control mb3",
-                "placeholder": _("Address (line 2)"),
-                "id": "form-address2",
+                "placeholder": _("Apartment"),
+                "id": "form-street-number",
             },
         ),
     )
@@ -344,8 +392,10 @@ class UserAddressForm(forms.ModelForm):
             "state",
             "city",
             "postcode",
-            "address_line_1",
-            "address_line_2",
+            "street_name",
+            "street_number",
+            "floor",
+            "apartment",
             "delivery_instructions",
         )
 
@@ -358,8 +408,10 @@ class UserAddressForm(forms.ModelForm):
         self.fields["state"].required = True
         self.fields["city"].required = True
         self.fields["postcode"].required = True
-        self.fields["address_line_1"].required = True
-        self.fields["address_line_2"].required = False
+        self.fields["street_name"].required = True
+        self.fields["street_number"].required = True
+        self.fields["floor"].required = True
+        self.fields["apartment"].required = True
         self.fields["delivery_instructions"].required = False
 
 

@@ -17,27 +17,15 @@ class OrderForm(forms.ModelForm):
             }
         )
     )
-    address1 = forms.CharField(
-        label='Domicilio (línea 1)',
+    address = forms.CharField(
+        label='Domicilio',
         min_length=4,
         max_length=250,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control mb3',
-                'placeholder': 'Domicilio (línea 1)',
-                'id': 'form-address1',
-            }
-        )
-    )
-    address2 = forms.CharField(
-        label='Domicilio (línea 2)',
-        min_length=4,
-        max_length=250,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control mb3',
-                'placeholder': 'Domicilio (línea 2)',
-                'id': 'form-address2',
+                'placeholder': 'Domicilio',
+                'id': 'form-address',
             }
         )
     )
@@ -104,6 +92,17 @@ class OrderForm(forms.ModelForm):
             }
         )
     )
+    shipping_option = forms.CharField(
+        label='Tipo de envío',
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control mb3',
+                'placeholder': 'Tipo de envío',
+                'id': 'form-shipping-option',
+            }
+        )
+    )
     billing_status = forms.BooleanField(
         label='Pago',
         widget=forms.CheckboxInput(
@@ -119,23 +118,23 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = (
             'full_name',
-            'address1',
-            'address2',
+            'address',
             'city',
             'phone',
             'postcode',
             'total_paid',
             'order_key',
+            'shipping_option',
             'billing_status',
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['full_name'].required = True
-        self.fields['address1'].required = True
-        self.fields['address2'].required = False
+        self.fields['address'].required = True
         self.fields['city'].required = True
         self.fields['phone'].required = True
         self.fields['postcode'].required = True
         self.fields['total_paid'].required = True
         self.fields['order_key'].required = False
+        self.fields['shipping_option'].required = True

@@ -29,8 +29,7 @@ def order(request):
         total = basket.get_total_price()
         order_form = OrderForm(data={
             'full_name': user.name,
-            'address1': user.address_line_1,
-            'address2': user.address_line_2,
+            'address': user.address,
             # 'city': user.city,                # Sólo envíos a Rosario x el momento (cambiar forms si se activa)
             'city': 'Rosario',
             'phone': user.cell_phone,
@@ -49,10 +48,8 @@ def add(request):
         order = Order.objects.create(                   # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
             user=user,
             full_name=request.POST.get('full_name'),
-            # address1=request.POST.get('address1'),
-            address1='No aplica',                       # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
-            # address2=request.POST.get('address2'),
-            address2='No aplica',                       # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
+            # address=request.POST.get('address'),
+            address='No aplica',                       # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
             # city=request.POST.get('city'),
             city='No aplica',                           # <------ ELIMINAR CUANDO HAGA EL IF RETIRO/ENVIO
             phone=request.POST.get('phone'),

@@ -9,8 +9,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+# Por motivos de seguridad todas las llaves secretas se encuentran
+# en un archivo json incluido en .gitignore
+with open('secret_keys.json', 'r') as arch:
+    MY_SECRET_KEYS = loads(arch.read())
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l*@5g11avb*zhlku=+_!gm-9xe=fdgw$9ke&u9-j-4cg($&5zb'
+my_secret_key = str(MY_SECRET_KEYS["DJANGO"])
+SECRET_KEY = my_secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -103,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
@@ -137,6 +143,8 @@ AUTH_USER_MODEL = 'account.Customer'
 LOGIN_REDIRECT_URL = 'account/dashboard'
 LOGIN_URL = 'account/login/'
 
+# Site name
+SITE_NAME = 'MF! Store'
 
 # Email setting
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

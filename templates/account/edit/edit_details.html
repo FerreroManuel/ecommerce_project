@@ -8,7 +8,7 @@
 {% block account_content %}
   
 
-    <form class="account-form" method="post" enctype="multipart/form-data">
+  <form class="account-form" method="post" enctype="multipart/form-data">
 
     {% if user_form.is_valid and profile_form.is_valid  %}
       <div class="alert alert-primary" role="alert">
@@ -44,9 +44,13 @@
     <label class="small font-weight-bold">{{ user_form.email.label }}</label>
     {{ user_form.email }}
 
-    {% comment %} NAME {% endcomment %}
-    <label class="small font-weight-bold">{{ user_form.name.label }}</label>
-    {{ user_form.name }}
+    {% comment %} FIRST NAME {% endcomment %}
+    <label class="small font-weight-bold">{{ user_form.first_name.label }}</label>
+    {{ user_form.first_name }}
+    
+    {% comment %} LAST NAME {% endcomment %}
+    <label class="small font-weight-bold">{{ user_form.last_name.label }}</label>
+    {{ user_form.last_name }}
 
     {% comment %} PHONE_NUMBER {% endcomment %}
     <label class="small font-weight-bold">{{ user_form.phone_number.label }}</label>
@@ -68,8 +72,8 @@
   
 
   {% comment %} DELETE ACCOUNT {% endcomment %}
-    <p class=" h3 pt-4 font-weight-bold">Eliminar cuenta</p>
-    <p>Esta acción no puede deshacerse.</p>
-    <a href="{% url 'account:delete_confirmation' %}" role="button" class="btn btn-danger btn-block py-2 mb-4 mt-3 fw-bold w-100">Eliminar</a>
+  <p class=" h3 pt-4 font-weight-bold">Eliminar cuenta</p>
+  <p>Esta acción no puede deshacerse.</p>
+  <a href="{% url 'account:delete_confirmation' %}" role="button" class="btn btn-danger btn-block py-2 mb-4 mt-3 fw-bold w-100">Eliminar</a>
 
 {% endblock account_content %}

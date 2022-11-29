@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -121,7 +122,7 @@ def pwd_change_confirm(request):
 
 @login_required
 def view_address(request):
-    addresses = Address.objects.filter(customer=request.user)
+    addresses = Address.objects.filter(customer=request.user).order_by('-default')
     return render(request, "account/dashboard/addresses.html", {"addresses": addresses})
 
 
@@ -136,24 +137,30 @@ def add_address(request):
             return HttpResponseRedirect(reverse("account:addresses"))
     else:
         address_form = UserAddressForm()
-    return render(request, "account/edit/edit_addresses.html", {"form": address_form})
+    return render(request, "account/edit/edit_addresses.html", {"form": address_form, "action": 'ADD'})
 
 
 @login_required
 def edit_address(request, id):                                # AGREGAR MESSAGES AL EXCEPT
-    if request.method == "POST":
-        try:
-            address = Address.objects.get(pk=id, customer=request.user)
-        except Address.DoesNotExist:
-            return redirect("account:addresses")
-        address_form = UserAddressForm(instance=address, data=request.POST)
-        if address_form.is_valid():
-            address_form.save()
-            return HttpResponseRedirect(reverse("account:addresses"))
-    else:
-        address = Address.objects.get(pk=id, customer=request.user)
-        address_form = UserAddressForm(instance=address)
-    return render(request, "account/edit/edit_addresses.html", {"form": address_form})
+    try:
+        if request.method == "POST":
+            try:
+                address = Address.objects.get(pk=id, customer=request.user)
+            except Address.DoesNotExist:
+                return redirect("account:addresses")
+            address_form = UserAddressForm(instance=address, data=request.POST)
+            if address_form.is_valid():
+                address_form.save()
+                return HttpResponseRedirect(reverse("account:addresses"))
+        else:
+            try:
+                address = Address.objects.get(pk=id, customer=request.user)
+            except Address.DoesNotExist:
+                return redirect("account:addresses")
+            address_form = UserAddressForm(instance=address)
+        return render(request, "account/edit/edit_addresses.html", {"form": address_form, "action": 'EDIT'})
+    except ValidationError:
+        return redirect("account:addresses")
 
 
 @login_required(login_url=reverse_lazy("account:login"))
@@ -190,8 +197,6 @@ def set_default(request, id):                                   # AGREGAR MESSAG
 def orders(request):
     orders, orders_paid = user_orders(request)
     return render(request, "account/dashboard/orders.html", {"orders": orders, "orders_paid": orders_paid})
-
-
 
 
 # -------- WISHLIST --------

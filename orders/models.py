@@ -19,13 +19,8 @@ class Order(models.Model):
     full_name = models.CharField(
         max_length=50,
     )
-    address1 = models.CharField(
+    address = models.CharField(
         max_length=250,
-    )
-    address2 = models.CharField(
-        max_length=250,
-        blank=True,
-        null=True,
     )
     city = models.CharField(
         max_length=100,
@@ -56,6 +51,9 @@ class Order(models.Model):
     payment_option = models.CharField(
         max_length=200,
         blank=True,
+    )
+    shipping_option = models.CharField(
+        max_length=200,
     )
     billing_status = models.BooleanField(
         default=False,

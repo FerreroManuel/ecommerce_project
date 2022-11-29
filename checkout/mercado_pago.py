@@ -1,6 +1,8 @@
 import mercadopago
 from django.conf import settings
 
+from core.settings.base import MY_SECRET_KEYS
+
 # Estados de pago => {'cod_mercadpago': 'Leyenda'}
 PAYMENT_STATUS = {
     'approved': 'Aprobado',
@@ -13,5 +15,7 @@ PAYMENT_STATUS = {
     'cc_rejected_bad_filled_other': 'Error en el formulario',
 }
 
+mp_secret_key = str(MY_SECRET_KEYS["MERCADOPAGO"])
+
 # SDK mercadopago
-sdk = mercadopago.SDK("TEST-5622471274489517-111321-e57eecea6c970f0cad625288764233de-27937419")
+sdk = mercadopago.SDK(mp_secret_key)

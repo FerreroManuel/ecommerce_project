@@ -45,21 +45,22 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     también en esta tabla.
     """
     # Personal information
-    email = models.EmailField(_("email address"), unique=True)
-    name = models.CharField(max_length=150)
-    phone_number = PhoneNumberField(blank=True)
+    email = models.EmailField(_("Email address"), unique=True)
+    first_name = models.CharField(_("First name"), max_length=150)
+    last_name = models.CharField(_("Last name"), max_length=150)
+    phone_number = PhoneNumberField(_("Phone number"), blank=True)
 
     # User status
-    is_active = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(_("Is active?"), default=False)
+    is_staff = models.BooleanField(_("Is staff?"), default=False)
+    created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
 
     # Configuration data
     objects = CustomAccountManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     class Meta:
         verbose_name = "Accounts"
@@ -77,7 +78,8 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 
     def __str__(self):
-        return self.name
+        name = self.first_name + ' ' + self.last_name
+        return name
 
 
 class Address(models.Model):
@@ -90,13 +92,15 @@ class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False,)
     customer = models.ForeignKey(Customer, verbose_name=_("Customer"), on_delete=models.CASCADE)
     full_name = models.CharField(_("Full name"), max_length=150)
-    phone_number = PhoneNumberField(blank=True)
-    country = CountryField(blank=True)
-    state = models.CharField(max_length=150, blank=True)
-    city = models.CharField(max_length=150, blank=True)
-    postcode = models.CharField(max_length=12, blank=True)
-    address_line_1 = models.CharField(max_length=150, blank=True)
-    address_line_2 = models.CharField(max_length=150, blank=True, null=True)
+    phone_number = PhoneNumberField(_("Phone number"), blank=True)
+    country = CountryField(_("Country"), blank=True)
+    state = models.CharField(_("Estado / Provincia"), max_length=150, blank=True)
+    city = models.CharField(_("City"), max_length=150, blank=True)
+    postcode = models.CharField(_("Postal code"), max_length=12, blank=True)
+    street_name = models.CharField(_("Street name"), max_length=150, blank=True)
+    street_number = models.PositiveIntegerField(_("Street number"), blank=True)
+    floor = models.PositiveIntegerField(_("Floor"), blank=True, null=True)
+    apartment = models.CharField(_("Apartment"), max_length=150, blank=True, null=True)
     delivery_instructions = models.CharField(
         _("Delivery instructions"),
         max_length=255,
@@ -114,7 +118,53 @@ class Address(models.Model):
 
     
     def __str__(self):
-        address = f"{self.address_line_1}"
-        if self.address_line_2:
-            address += f" {self.address_line_2}"
+        address = self.street_name + ' ' + str(self.street_number)
+        if self.floor:
+            address += ' ' + str(self.floor)
+        if self.apartment:
+            address += ' ' + self.apartment
+        return address
+
+
+class WarehouseAddress(models.Model):
+    """
+    Tabla de direcciones del local dónde se pueden retirar los pedidos
+    """
+    full_name = models.CharField(_("Warehouse name"), max_length=150)
+    street_name = models.CharField(_("Street name"), max_length=150, blank=True)
+    street_number = models.PositiveIntegerField(_("Street number"), blank=True)
+    floor = models.PositiveIntegerField(_("Floor"), blank=True, null=True)
+    apartment = models.CharField(_("Apartment"), max_length=150, blank=True, null=True)
+    country = CountryField(blank=True)
+    state = models.CharField(max_length=150, blank=True)
+    city = models.CharField(max_length=150, blank=True)
+    postcode = models.CharField(max_length=12, blank=True)    
+    phone_number = PhoneNumberField(blank=True)
+    time_window = models.CharField(
+        _("Pick up time window"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+    order = models.PositiveIntegerField(
+        verbose_name=_("List order"),
+        help_text=_("Required"),
+        default=0,
+    )
+    is_active = models.BooleanField(_("Is active?"), default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        verbose_name = _("Warehose address")
+        verbose_name_plural = _("Warehose addresses")
+    
+
+    def __str__(self):
+        address = self.street_name + ' ' + str(self.street_number)
+        if self.floor:
+            address += str(self.floor)
+        if self.apartment:
+            address += ' ' + self.apartment
         return address

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Mis direcciones
+Mis pedidos
 {% endblock title %}
 
 {% block stylesheet %}
@@ -33,7 +33,11 @@ Mis direcciones
                   <div class="dropdown">
                     <a class="text-reset text-decoration-none dropdown-toggle" href="#" role="link" id="dropdownLink"
                       data-bs-toggle="dropdown" aria-expanded="false">
-                      Enviar a
+                      {% if order_p.shipping_option == 'Envío' %}
+                        Enviar a
+                      {% elif order_p.shipping_option == 'Retiro' %}
+                        Retira
+                      {% endif %}
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
                         class="bi bi-chevron-down" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -41,17 +45,17 @@ Mis direcciones
                       </svg>
                     </a>
 
-                    <ul class="dropdown-menu" aria-labelledby="dropdownLink">
-                      <li class="item small">{{order_p.full_name}}</li>
-                      <li class="item small">{{order_p.address1}}</li>
-                      <li class="item small">{{order_p.address2}}</li>
-                      <li class="item small">{{order_p.postal_code}}</li>
+                    <ul class="dropdown-menu shadow" aria-labelledby="dropdownLink">
+                      <li class="item small"><b>{{order_p.full_name}}</b></li>
+                      <li class="item small">{{order_p.phone}}</li>
+                      <li class="item small">{{order_p.address}}</li>
+                      <li class="item small">{{order_p.city}} ({{order_p.postal_code}})</li>
                     </ul>
                   </div>
 
                 </div>
                 <div class="text-end">
-                  Total pago: <span class="fw-bold">$ {{ order_p.total_paid }}</span>
+                  Total pago: <span class="fw-bold">$ {{ order_p.total_paid|floatformat:2 }}</span>
                 </div>
               </div>
               <div class="col-md-5 col-lg-4 order-md-last p-0 order-3">
@@ -108,7 +112,11 @@ Mis direcciones
                   <div class="dropdown">
                     <a class="text-reset text-decoration-none dropdown-toggle" href="#" role="link" id="dropdownLink"
                       data-bs-toggle="dropdown" aria-expanded="false">
-                      Enviar a
+                      {% if order.shipping_option == 'Envío' %}
+                        Enviar a
+                      {% elif order.shipping_option == 'Retiro' %}
+                        Retira
+                      {% endif %}
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
                         class="bi bi-chevron-down" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -116,17 +124,17 @@ Mis direcciones
                       </svg>
                     </a>
 
-                    <ul class="dropdown-menu" aria-labelledby="dropdownLink">
-                      <li class="item small">{{order.full_name}}</li>
-                      <li class="item small">{{order.address1}}</li>
-                      <li class="item small">{{order.address2}}</li>
-                      <li class="item small">{{order.post_code}}</li>
+                    <ul class="dropdown-menu shadow" aria-labelledby="dropdownLink">
+                      <li class="item small"><b>{{order.full_name}}</b></li>
+                      <li class="item small">{{order.phone}}</li>
+                      <li class="item small">{{order.address}}</li>
+                      <li class="item small">{{order.city}} ({{order.postal_code}})</li>
                     </ul>
                   </div>
 
                 </div>
                 <div class="text-end">
-                  Total a pagar: <span class="fw-bold">$ {{ order.total_paid }}</span>
+                  Total a pagar: <span class="fw-bold">$ {{ order.total_paid|floatformat:2 }}</span>
                 </div>
               </div>
               <div class="col-md-5 col-lg-4 order-md-last p-0 order-3">

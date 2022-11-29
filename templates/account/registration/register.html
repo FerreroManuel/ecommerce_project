@@ -33,10 +33,15 @@
       <span class="text-muted small">*</span></label>
     {{ form.email }}
 
-    {% comment %} NAME {% endcomment %}
-    <label>{{ form.name.label}}
+    {% comment %} FIRST NAME {% endcomment %}
+    <label>{{ form.first_name.label}}
       <span class="text-muted small">*</span></label>
-    {{ form.name }}
+    {{ form.first_name }}
+
+    {% comment %} LAST NAME {% endcomment %}
+    <label>{{ form.last_name.label}}
+      <span class="text-muted small">*</span></label>
+    {{ form.last_name }}
 
     {% comment %} PHONE_NUMBER {% endcomment %}
     <label>{{ form.phone_number.label}}

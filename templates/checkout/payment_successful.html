@@ -34,7 +34,11 @@
             <div class="dropdown">
               <a class="text-reset text-decoration-none dropdown-toggle" href="#" role="link" id="dropdownLink"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                Enviar a
+                {% if order.shipping_option == 'Envío' %}
+                  Enviar a
+                {% elif order.shipping_option == 'Retiro' %}
+                  Retira
+                {% endif %}
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
                   class="bi bi-chevron-down" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
@@ -42,20 +46,20 @@
                 </svg>
               </a>
 
-              <ul class="dropdown-menu" aria-labelledby="dropdownLink">
-                <li class="item small">{{order.full_name}}</li>
-                <li class="item small">{{order.address1}}</li>
-                <li class="item small">{{order.address2}}</li>
-                <li class="item small">{{order.postal_code}}</li>
+              <ul class="dropdown-menu shadow" aria-labelledby="dropdownLink">
+                <li class="item small"><b>{{order.full_name}}</b></li>
+                <li class="item small">{{order.phone}}</li>
+                <li class="item small">{{order.address}}</li>
+                <li class="item small">{{order.city}} ({{order.postal_code}})</li>
               </ul>
             </div>
 
           </div>
           <div class="text-end">
             {% if order.billing_status == True %}
-              Total pago: <span class="fw-bold">$ {{ order.total_paid }}</span>            
+              Total pago: <span class="fw-bold">$ {{ order.total_paid|floatformat:2 }}</span>            
             {% else %}
-              Total a pagar: <span class="fw-bold">$ {{ order.total_paid }}</span>
+              Total a pagar: <span class="fw-bold">$ {{ order.total_paid|floatformat:2 }}</span>
             {% endif %}
           </div>
         </div>
