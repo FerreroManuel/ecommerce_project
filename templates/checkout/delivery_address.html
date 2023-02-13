@@ -15,7 +15,8 @@
 
 <div class="container">
   {% if messages %}
-      <div class="alert alert-warning" alert-{{ message.tags }} role="alert">
+      <div class="alert alert-warning alert-dismissible fade show" alert-{{ message.tags }} role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         {% for message in messages %}
           {{message|safe}}
         {% endfor %}
