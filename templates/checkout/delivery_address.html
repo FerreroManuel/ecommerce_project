@@ -14,6 +14,33 @@
 
 
 <div class="container">
+  <div class="row g-3">
+    {% if addresses|length == 0 %}
+    <div class="col-12">
+      {% if delivery_method == 'IS' %}
+      No se encontraron direcciones para retirar. <a href="{% url 'store:product_all' %}"> Ir a la tienda</a>.
+      {% else %}
+      No se encontraron direcciones de envío. <a href="{% url 'checkout:delivery_choices' %}"> Elegir otro tipo de envío</a>.
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="col-12">
+      {% if delivery_method == 'IS' %}
+      <h1 class="h2">Direcciones de retiro</h1>
+      {% else %}
+      <h1 class="h2">Direcciones de envío</h1>
+      {% endif %}
+    </div>
+    <div class="col-12">
+      {% if delivery_method == 'IS' %}
+      <p>Seleccione una dirección donde retirar su pedido</p>
+      {% else %}
+      <p>Seleccione una dirección donde enviar su pedido</p>
+      {% endif %}
+    </div>
+    <hr />
+  </div>
+  
   {% if messages %}
       <div class="alert alert-warning alert-dismissible fade show" alert-{{ message.tags }} role="alert">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -22,33 +49,6 @@
         {% endfor %}
       </div>
   {% endif %}
-    <div class="row g-3">
-      {% if addresses|length == 0 %}
-        <div class="col-12">
-          {% if delivery_method == 'IS' %}
-          No se encontraron direcciones para retirar. <a href="{% url 'store:product_all' %}"> Ir a la tienda</a>.
-          {% else %}
-            No se encontraron direcciones de envío. <a href="{% url 'checkout:delivery_choices' %}"> Elegir otro tipo de envío</a>.
-          {% endif %}
-        </div>
-      {% else %}
-        <div class="col-12">
-          {% if delivery_method == 'IS' %}
-            <h1 class="h2">Direcciones de retiro</h1>
-          {% else %}
-            <h1 class="h2">Direcciones de envío</h1>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {% if delivery_method == 'IS' %}
-            <p>Seleccione una dirección donde retirar su pedido</p>
-          {% else %}
-            <p>Seleccione una dirección donde enviar su pedido</p>
-          {% endif %}
-        </div>
-        <hr />
-      </div>
-
 
       <div class="container">
         <div class="row g-3">
